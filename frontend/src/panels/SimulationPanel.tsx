@@ -1,4 +1,5 @@
 import { useStudioStore } from '../store/useStudioStore'
+import { Spinner } from '../components/Spinner'
 import { Playback } from './Playback'
 import { useAutoAdvance } from './useAutoAdvance'
 
@@ -28,7 +29,7 @@ function SingleRun() {
 
   return (
     <section aria-label="Simulate one string">
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
         Simulate
       </h3>
       <form
@@ -47,7 +48,13 @@ function SingleRun() {
           className="min-w-0 flex-1 rounded-md border border-slate-300 bg-transparent px-2 py-1 font-mono dark:border-slate-600"
         />
         <button type="submit" className="btn btn-primary" disabled={sim.running}>
-          {sim.running ? 'Running…' : 'Run'}
+          {sim.running ? (
+            <span className="inline-flex items-center gap-1.5">
+              <Spinner /> Running…
+            </span>
+          ) : (
+            'Run'
+          )}
         </button>
       </form>
 
@@ -77,7 +84,7 @@ function SingleRun() {
           />
 
           <div className="rounded-md border border-slate-200 p-3 text-sm dark:border-slate-700">
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
               Step {step} of {last}
             </p>
             <p className="font-medium">{current.title}</p>
@@ -89,7 +96,7 @@ function SingleRun() {
               role="status"
               data-testid="verdict"
               className={`rounded-md px-3 py-2 text-center text-sm font-bold ${
-                trace.accepted ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
+                trace.accepted ? 'bg-emerald-700 text-white' : 'bg-red-600 text-white'
               }`}
             >
               {trace.accepted ? 'Accepted' : trace.stuck ? 'Rejected (no transition)' : 'Rejected'}
@@ -103,7 +110,7 @@ function SingleRun() {
 
 function Tape({ input, position, failed }: { input: string; position: number; failed: boolean }) {
   if (input === '') {
-    return <p className="font-mono text-sm text-slate-500">Empty input (ε)</p>
+    return <p className="font-mono text-sm text-slate-600 dark:text-slate-400">Empty input (ε)</p>
   }
   return (
     <div
@@ -124,7 +131,7 @@ function Tape({ input, position, failed }: { input: string; position: number; fa
                   ? 'border-blue-500 bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-100'
                   : i === position
                     ? 'border-slate-900 ring-2 ring-slate-900/40 dark:border-white dark:ring-white/40'
-                    : 'border-slate-300 text-slate-500 dark:border-slate-600'
+                    : 'border-slate-300 text-slate-600 dark:border-slate-600 dark:text-slate-400'
             }`}
           >
             {ch}
@@ -140,7 +147,7 @@ function BatchRun() {
   const { setBatchText, runBatch } = useStudioStore.getState()
   return (
     <section aria-label="Batch test">
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
         Batch test
       </h3>
       <textarea
@@ -158,7 +165,13 @@ function BatchRun() {
         onClick={() => void runBatch()}
         disabled={batch.running}
       >
-        {batch.running ? 'Running…' : 'Run all'}
+        {batch.running ? (
+          <span className="inline-flex items-center gap-1.5">
+            <Spinner /> Running…
+          </span>
+        ) : (
+          'Run all'
+        )}
       </button>
       {batch.error && (
         <p
@@ -171,7 +184,7 @@ function BatchRun() {
       {batch.results && (
         <table className="mt-3 w-full text-sm">
           <thead>
-            <tr className="text-left text-xs text-slate-500">
+            <tr className="text-left text-xs text-slate-600 dark:text-slate-400">
               <th className="py-1 font-medium">Input</th>
               <th className="py-1 font-medium">Result</th>
             </tr>
@@ -180,7 +193,11 @@ function BatchRun() {
             {batch.results.map((r, i) => (
               <tr key={i} className="border-t border-slate-200 dark:border-slate-700">
                 <td className="py-1 font-mono">
-                  {r.input === '' ? <em className="text-slate-500">ε</em> : r.input}
+                  {r.input === '' ? (
+                    <em className="text-slate-600 dark:text-slate-400">ε</em>
+                  ) : (
+                    r.input
+                  )}
                 </td>
                 <td className="py-1" title={r.error ?? undefined}>
                   {r.error !== null ? (

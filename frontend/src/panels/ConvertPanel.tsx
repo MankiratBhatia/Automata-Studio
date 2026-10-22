@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { Spinner } from '../components/Spinner'
 import { subsetKey } from '../model/labels'
 import { useStudioStore } from '../store/useStudioStore'
 
-const HEADING = 'mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500'
+const HEADING =
+  'mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400'
 
 export function ConvertPanel() {
   return (
@@ -40,7 +42,7 @@ function RegexSection() {
           aria-invalid={error !== null}
           className="w-full rounded-md border border-slate-300 bg-transparent px-2 py-1 font-mono dark:border-slate-600"
         />
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
           <code>|</code> union · <code>*</code> <code>+</code> <code>?</code> repeat ·{' '}
           <code>( )</code> group · <code>ε</code> empty string · <code>∅</code> empty set ·{' '}
           <code>\</code> escapes
@@ -123,7 +125,7 @@ function ConvertSection() {
           const reason = empty ? 'Draw or load an automaton first.' : a.disabled
           return (
             <li key={a.op} className="flex items-center justify-between gap-2">
-              <span className="text-xs text-slate-500">{a.help}</span>
+              <span className="text-xs text-slate-600 dark:text-slate-400">{a.help}</span>
               <button
                 type="button"
                 className="btn"
@@ -152,7 +154,16 @@ function ConvertSection() {
 function Result() {
   const note = useStudioStore((s) => s.convert.note)
   const running = useStudioStore((s) => s.convert.running)
-  if (running) return <p className="text-sm text-slate-500">Working…</p>
+  if (running) {
+    return (
+      <p
+        role="status"
+        className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400"
+      >
+        <Spinner /> Working…
+      </p>
+    )
+  }
   if (!note) return null
   return (
     <p
@@ -185,7 +196,7 @@ function StateKey() {
           ))}
         </tbody>
       </table>
-      <p className="mt-2 text-xs text-slate-500">
+      <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">
         Each DFA state is the set of NFA states the automaton could be in. ∅ is the trap state.
       </p>
     </section>

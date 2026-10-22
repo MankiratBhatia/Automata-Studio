@@ -1,3 +1,5 @@
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { defineConfig } from '@playwright/test'
 
 // Locally the backend runs from its virtualenv; CI sets PYTHON=python.
@@ -17,6 +19,10 @@ export default defineConfig({
     {
       command: `${python} -m uvicorn app.main:app --port 8000`,
       cwd: '../backend',
+      // Tests save projects: give the backend a throwaway database, never the real one.
+      env: {
+        AUTOMATA_DB: process.env.AUTOMATA_DB ?? join(tmpdir(), 'automata-studio-e2e.sqlite3'),
+      },
       url: 'http://127.0.0.1:8000/api/health',
       reuseExistingServer: !process.env.CI,
     },

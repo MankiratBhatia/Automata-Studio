@@ -12,6 +12,8 @@ const LEGACY_KEY = 'automata-studio:doc:v1' // Phase 2 saved a single automaton 
 export interface SavedTab {
   id: string
   doc: Automaton
+  /** The saved project this tab was opened from or last saved as, if any. */
+  projectId?: string
 }
 
 export interface SavedWorkspace {
@@ -26,9 +28,20 @@ export function loadWorkspace(): SavedWorkspace | null {
     const text = localStorage.getItem(WORKSPACE_KEY)
     if (text) {
       const raw: unknown = JSON.parse(text)
-      const obj = raw as { tabs?: { id?: unknown; doc?: unknown }[]; activeId?: unknown }
+      const obj = raw as {
+        tabs?: { id?: unknown; doc?: unknown; projectId?: unknown }[]
+        activeId?: unknown
+      }
       const tabs = (obj.tabs ?? []).flatMap((t) =>
-        typeof t.id === 'string' ? [{ id: t.id, doc: parseAutomatonValue(t.doc) }] : [],
+        typeof t.id === 'string'
+          ? [
+              {
+                id: t.id,
+                doc: parseAutomatonValue(t.doc),
+                ...(typeof t.projectId === 'string' ? { projectId: t.projectId } : {}),
+              },
+            ]
+          : [],
       )
       if (tabs.length > 0) {
         const activeId = tabs.some((t) => t.id === obj.activeId)
@@ -51,7 +64,11 @@ export function saveWorkspace(ws: SavedWorkspace): void {
       WORKSPACE_KEY,
       JSON.stringify({
         activeId: ws.activeId,
-        tabs: ws.tabs.map((t) => ({ id: t.id, doc: JSON.parse(serializeAutomaton(t.doc)) })),
+        tabs: ws.tabs.map((t) => ({
+          id: t.id,
+          doc: JSON.parse(serializeAutomaton(t.doc)),
+          projectId: t.projectId,
+        })),
       }),
     )
   } catch (e) {

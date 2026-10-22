@@ -11,7 +11,7 @@ export function PropertiesPanel() {
       {selection?.kind === 'state' && <StateSection id={selection.id} />}
       {selection?.kind === 'edge' && <EdgeSection from={selection.from} to={selection.to} />}
       {!selection && (
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-slate-600 dark:text-slate-400">
           Select a state or transition on the canvas to edit it. Double-click empty space to add a
           state; drag from a state’s dot to connect.
         </p>
@@ -23,7 +23,7 @@ export function PropertiesPanel() {
 
 function Heading({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+    <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
       {children}
     </h3>
   )
@@ -81,7 +81,7 @@ function AutomatonSection() {
             placeholder="0, 1"
             className="mt-1 w-full rounded-md border border-slate-300 bg-transparent px-2 py-1 font-mono dark:border-slate-600"
           />
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-slate-600 dark:text-slate-400">
             Single characters. Applied when you leave the field.
           </span>
         </label>

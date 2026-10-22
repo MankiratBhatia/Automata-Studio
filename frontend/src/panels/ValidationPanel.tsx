@@ -1,4 +1,5 @@
 import type { Issue } from '../api/types'
+import { Spinner } from '../components/Spinner'
 import { useStudioStore } from '../store/useStudioStore'
 
 export function ValidationPanel() {
@@ -15,7 +16,13 @@ export function ValidationPanel() {
       </p>
     )
   }
-  if (!issues) return <p className="p-4 text-sm text-slate-500">Checking…</p>
+  if (!issues) {
+    return (
+      <p className="flex items-center gap-2 p-4 text-sm text-slate-600 dark:text-slate-400">
+        <Spinner /> Checking…
+      </p>
+    )
+  }
 
   const errors = issues.filter((i) => i.severity === 'error').length
   const warnings = issues.length - errors
@@ -68,7 +75,7 @@ export function ValidationPanel() {
               </span>
               {i.message}
               {(i.stateIds.length > 0 || i.transitionIndices.length > 0) && (
-                <span className="mt-1 block text-xs text-slate-500">
+                <span className="mt-1 block text-xs text-slate-600 dark:text-slate-400">
                   Click to highlight on the canvas
                 </span>
               )}

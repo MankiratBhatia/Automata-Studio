@@ -4,6 +4,8 @@ import type {
   BatchResponse,
   ConvertResponse,
   EquivalenceResponse,
+  Project,
+  ProjectSummary,
   Issue,
   SimulateResponse,
   ValidateResponse,
@@ -50,6 +52,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     }
     throw new ApiError(`Request failed (${res.status})`, res.status)
   }
+  if (res.status === 204) return undefined as T // e.g. DELETE: no body
   return (await res.json()) as T
 }
 
@@ -85,3 +88,20 @@ export const minimizeDfa = (automaton: Automaton): Promise<ConvertResponse> =>
 
 export const checkEquivalence = (a: Automaton, b: Automaton): Promise<EquivalenceResponse> =>
   post('/api/equivalence', { a, b })
+
+export const listProjects = (): Promise<ProjectSummary[]> => request('/api/projects')
+
+export const getProject = (id: string): Promise<Project> => request(`/api/projects/${id}`)
+
+export const createProject = (automaton: Automaton): Promise<Project> =>
+  post('/api/projects', { automaton })
+
+export const updateProject = (id: string, automaton: Automaton): Promise<Project> =>
+  request(`/api/projects/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ automaton }),
+  })
+
+export const deleteProject = (id: string): Promise<void> =>
+  request(`/api/projects/${id}`, { method: 'DELETE' })

@@ -155,3 +155,39 @@ export function toFlow(
 
   return { nodes, edges }
 }
+
+// --- keeping unchanged elements identical between renders --------------------------------
+
+const shallowEqual = (a: Record<string, unknown>, b: Record<string, unknown>): boolean => {
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)])
+  return [...keys].every((k) => a[k] === b[k])
+}
+
+type Keyed = { id: string; position?: { x: number; y: number }; data?: Record<string, unknown> }
+
+const sameElement = (a: Keyed, b: Keyed): boolean => {
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)])
+  const rec = (o: Keyed) => o as unknown as Record<string, unknown>
+  return [...keys].every((k) => {
+    if (k === 'data') return shallowEqual(a.data ?? {}, b.data ?? {})
+    if (k === 'position') return a.position?.x === b.position?.x && a.position?.y === b.position?.y
+    return rec(a)[k] === rec(b)[k]
+  })
+}
+
+/**
+ * Return `next`, but with each element replaced by its object from `previous` when nothing
+ * about it changed. React Flow treats a new object as a changed node and re-measures it, and
+ * while it does, every edge attached to it vanishes for a frame. Handing it the same object
+ * when nothing changed keeps selection clicks from tearing down the whole drawing.
+ * `previous` is updated to match `next`.
+ */
+export function stabilize<T extends Keyed>(next: T[], previous: Map<string, T>): T[] {
+  const out = next.map((el) => {
+    const old = previous.get(el.id)
+    return old && sameElement(old, el) ? old : el
+  })
+  previous.clear()
+  for (const el of out) previous.set(el.id, el)
+  return out
+}

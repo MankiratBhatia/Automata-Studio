@@ -1,9 +1,14 @@
 # Automata Studio
 
 Interactive web app to build, simulate, analyse and convert DFA / NFA / ε-NFA.
-See [docs/PLAN.md](docs/PLAN.md) for the full roadmap. Current status: **Phase 4 (analysis and step-by-step visualisation)**. Draw, validate and simulate
-DFA/NFA/ε-NFA; convert (regex → ε-NFA → DFA → minimal DFA); replay each algorithm step by step; and
-check two automata for equivalence with a shortest counterexample. See the plan for what comes next.
+See [docs/PLAN.md](docs/PLAN.md) for the full roadmap. Current status: **Phase 5 (persistence and polish)**. Draw, validate and simulate DFA/NFA/ε-NFA;
+convert (regex → ε-NFA → DFA → minimal DFA); replay each algorithm step by step; check two automata
+for equivalence with a shortest counterexample; save projects, undo/redo, export images and tables,
+and use it in light or dark mode.
+
+More documentation: [`docs/ALGORITHMS.md`](docs/ALGORITHMS.md) (how each algorithm works, its cost and
+how it is tested), [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) (a 5-minute walkthrough, also run as
+an automated test) and [`docs/PLAN.md`](docs/PLAN.md) (the roadmap).
 
 ## Setup
 
@@ -49,6 +54,14 @@ cd frontend && npx playwright install chromium && npm run e2e   # starts both se
   colours the states by partition block. Arrow keys step, and the slider scrubs.
 - **Compare** tab: pick two tabs and check whether they accept the same language. If not, you get a
   shortest counterexample, and *Show both runs* plays it on both automata at once.
+- **Projects** / **Save** (Ctrl+S): save the current tab to the backend's SQLite database
+  (`backend/data/automata.sqlite3`, or the path in `AUTOMATA_DB`) and reopen it later. A dot on a tab
+  means unsaved changes. Your open tabs are also kept in the browser, so work survives even if the
+  backend is down.
+- **Undo / Redo** (Ctrl+Z, Ctrl+Y) per tab, up to 100 steps; a whole drag is one step.
+- **Export ▾**: the automaton as JSON, the drawing as PNG or SVG, or the transition table as
+  Markdown or CSV. Press **?** for all keyboard shortcuts.
+- **Theme**: System, Light or Dark.
 - Work autosaves in the browser. *Export* / *Import* use the JSON format in `docs/PLAN.md`.
 
 ## API types

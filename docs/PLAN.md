@@ -410,6 +410,19 @@ until the previous phase's Definition of Done is met.**
 - [ ] Full Playwright suite (4–5 flows) is green in CI.
 - [ ] **Tag `v1.0`.**
 
+**Status: done, except the `v1.0` tag (create it once you are happy with a CI run on GitHub).**
+Evidence for the Definition of Done:
+- [x] Full demo script runs with zero console errors: `docs/DEMO_SCRIPT.md` is run as `e2e/demo.spec.ts` in about 7 seconds, and every Playwright test fails if the page logs an error.
+- [x] Saved projects survive a backend restart: tested across two Python processes, and checked by killing and restarting the real server.
+- [x] Accessibility: Lighthouse (desktop preset) scores **100**, and axe finds no WCAG A/AA violations on any view, dialog or theme (`e2e/a11y.spec.ts`). On Lighthouse's phone emulation the score is 97, because the layout targets 1280×720.
+- [x] Everything works at 1280×720 (the viewport used by every E2E test).
+- [x] Full Playwright suite green (and in CI for the previous phases).
+
+Notes on what differs from the plan above:
+- Undo history is per tab and not saved across reloads. Typing in a field merges into one step.
+- Image export captures the editable canvas; it is refused with an explanation on a read-only replay.
+- Moving a project between machines is by exporting the JSON file; there is no sign-in or sharing.
+
 ### Phase 6 — Extensions (only after v1.0)
 - **PDA simulator:** configuration = (state, remaining input, stack). Non-determinism means BFS
   over configurations with a step/depth cap. Show the stack visually. Acceptance by final state

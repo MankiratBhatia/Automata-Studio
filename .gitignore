@@ -14,7 +14,8 @@ node_modules/
 dist/
 *.tsbuildinfo
 
-# App data
+# App data (saved projects live in backend/data/automata.sqlite3)
+backend/data/
 *.sqlite3
 *.db
 

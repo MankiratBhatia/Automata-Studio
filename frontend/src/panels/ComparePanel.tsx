@@ -1,8 +1,10 @@
 import { useMemo } from 'react'
+import { Spinner } from '../components/Spinner'
 import { showWord } from '../model/labels'
 import { docOfTab, selectWorkspace, useStudioStore } from '../store/useStudioStore'
 
-const HEADING = 'mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500'
+const HEADING =
+  'mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400'
 
 export function ComparePanel() {
   const storedTabs = useStudioStore((s) => s.tabs)
@@ -71,9 +73,15 @@ export function ComparePanel() {
           title={reason ?? undefined}
           onClick={() => bId && void runEquivalence(aId, bId)}
         >
-          {compare.running ? 'Checking…' : 'Check equivalence'}
+          {compare.running ? (
+            <span className="inline-flex items-center gap-1.5">
+              <Spinner /> Checking…
+            </span>
+          ) : (
+            'Check equivalence'
+          )}
         </button>
-        {reason && <p className="mt-2 text-xs text-slate-500">{reason}</p>}
+        {reason && <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">{reason}</p>}
       </section>
 
       {compare.error && (

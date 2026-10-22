@@ -36,7 +36,7 @@ class Automaton(BaseModel):
 
     schemaVersion: Literal[1] = 1
     kind: AutomatonKind
-    name: str = ""
+    name: str = Field(default="", max_length=200)
     alphabet: list[str] = Field(max_length=64)
     states: list[State] = Field(max_length=1000)
     start: str | None
@@ -172,3 +172,22 @@ class EquivalenceResponse(BaseModel):
     bAccepts: bool | None
     # How many pairs of DFA states the product search visited.
     explored: int
+
+
+# --- Phase 5: saved projects ------------------------------------------------------------
+
+
+class ProjectIn(BaseModel):
+    automaton: Automaton
+
+
+class ProjectSummary(BaseModel):
+    id: str
+    name: str
+    kind: AutomatonKind
+    createdAt: str
+    updatedAt: str
+
+
+class Project(ProjectSummary):
+    automaton: Automaton

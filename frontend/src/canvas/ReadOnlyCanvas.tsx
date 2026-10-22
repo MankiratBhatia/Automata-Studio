@@ -2,6 +2,7 @@ import { Background, Controls, ReactFlow, ReactFlowProvider } from '@xyflow/reac
 import '@xyflow/react/dist/style.css'
 import { useMemo } from 'react'
 import type { Automaton } from '../model/automaton'
+import { useTheme } from '../theme'
 import { NO_VIEW, toFlow, type CanvasView } from './canvasMapping'
 import { StateNodeComponent } from './StateNode'
 import { TransitionEdgeComponent } from './TransitionEdge'
@@ -29,17 +30,19 @@ export function ReadOnlyCanvas(props: Props) {
 }
 
 function Inner({ doc, view, label }: Props) {
+  const dark = useTheme((s) => s.dark)
   const { nodes, edges } = useMemo(
     () => toFlow(doc, { ...NO_VIEW, ...view, readOnly: true }),
     [doc, view],
   )
   return (
-    <div className="h-full w-full" role="img" aria-label={label} data-testid="readonly-canvas">
+    <div className="h-full w-full" role="group" aria-label={label} data-testid="readonly-canvas">
       <ReactFlow
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
+        colorMode={dark ? 'dark' : 'light'}
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={false}

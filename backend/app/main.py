@@ -3,8 +3,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app import adapters, schemas
-from app.routers import analyze, convert
+from app import adapters, schemas, storage
+from app.routers import analyze, convert, projects
 from automata_core.errors import (
     InputSymbolError,
     InvalidAutomatonError,
@@ -26,6 +26,7 @@ app.add_middleware(
 
 app.include_router(analyze.router)
 app.include_router(convert.router)
+app.include_router(projects.router)
 
 
 def _error(status: int, body: schemas.ErrorBody) -> JSONResponse:
@@ -49,6 +50,13 @@ def _invalid_automaton(_: Request, exc: InvalidAutomatonError) -> JSONResponse:
 def _input_symbol(_: Request, exc: InputSymbolError) -> JSONResponse:
     return _error(
         400, schemas.ErrorBody(code="INPUT_SYMBOL", message=str(exc), position=exc.position)
+    )
+
+
+@app.exception_handler(storage.ProjectNotFoundError)
+def _project_not_found(_: Request, __: storage.ProjectNotFoundError) -> JSONResponse:
+    return _error(
+        404, schemas.ErrorBody(code="NOT_FOUND", message="No saved project with that id.")
     )
 
 

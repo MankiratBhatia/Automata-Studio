@@ -11,7 +11,8 @@ import { useStudioStore } from '../store/useStudioStore'
 import { Playback } from './Playback'
 import { useAutoAdvance } from './useAutoAdvance'
 
-const HEADING = 'mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500'
+const HEADING =
+  'mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400'
 
 export function StepsPanel() {
   const record = useStudioStore((s) => s.records[s.activeTabId])
@@ -26,7 +27,7 @@ export function StepsPanel() {
 
   if (!record) {
     return (
-      <div className="space-y-2 p-4 text-sm text-slate-500">
+      <div className="space-y-2 p-4 text-sm text-slate-600 dark:text-slate-400">
         <p>No steps to replay for this tab.</p>
         <p>
           Build an automaton from a regex, or convert one on the <strong>Convert</strong> tab, then
@@ -72,7 +73,7 @@ export function StepsPanel() {
         data-testid="step-card"
         className="rounded-md border border-slate-200 p-3 text-sm dark:border-slate-700"
       >
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-600 dark:text-slate-400">
           Step {index} of {last}
         </p>
         <p className="font-medium">{step.title}</p>
@@ -116,7 +117,7 @@ function SubsetTable({ record, index }: { record: ConversionRecord; index: numbe
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="text-left text-xs text-slate-500">
+            <tr className="text-left text-xs text-slate-600 dark:text-slate-400">
               <th className="py-1 pr-2 font-medium">State</th>
               <th className="py-1 pr-2 font-medium">= NFA states</th>
               {symbols.map((c) => (
@@ -133,7 +134,7 @@ function SubsetTable({ record, index }: { record: ConversionRecord; index: numbe
           </tbody>
         </table>
       </div>
-      <p className="mt-2 text-xs text-slate-500">
+      <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">
         → marks the start state, * an accepting state. A dot is a move not discovered yet.
       </p>
     </section>
@@ -155,7 +156,7 @@ function Row({ row }: { row: TableRow }) {
           data-current={c.current || undefined}
           className={`px-2 py-1 font-mono ${c.current ? 'rounded bg-blue-100 font-semibold dark:bg-blue-900' : ''}`}
         >
-          {c.target ?? <span className="text-slate-400">·</span>}
+          {c.target ?? <span className="text-slate-600 dark:text-slate-400">·</span>}
         </td>
       ))}
     </tr>
@@ -169,7 +170,9 @@ function Partition({ record, index }: { record: ConversionRecord; index: number 
     return (
       <section aria-label="Partition">
         <h3 className={HEADING}>Partition</h3>
-        <p className="text-sm text-slate-500">No partition yet: first tidy up the automaton.</p>
+        <p className="text-sm text-slate-600 dark:text-slate-400">
+          No partition yet: first tidy up the automaton.
+        </p>
       </section>
     )
   }
@@ -195,7 +198,7 @@ function Partition({ record, index }: { record: ConversionRecord; index: number 
           </li>
         ))}
       </ul>
-      <p className="mt-2 text-xs text-slate-500">
+      <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">
         States in one block have behaved identically so far. The canvas uses the same colours.
       </p>
     </section>

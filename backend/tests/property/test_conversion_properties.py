@@ -85,3 +85,25 @@ def test_full_pipeline_from_a_regex_keeps_the_language(pattern: str) -> None:
     mdfa = minimize(nfa_to_dfa(enfa).automaton).automaton
     alphabet = ["a", "b"]
     assert language(mdfa, alphabet, MAX_LEN) == language(enfa, alphabet, MAX_LEN), pattern
+
+
+def _count(node: object) -> int:
+    """2 states per leaf, plus 2 for each union and each repetition (concatenation adds none)."""
+    from automata_core.regex import parser as P
+
+    if isinstance(node, P.Symbol | P.Epsilon | P.EmptySet):
+        return 2
+    if isinstance(node, P.Concat):
+        return sum(_count(p) for p in node.parts)
+    if isinstance(node, P.Union):
+        return 2 + sum(_count(p) for p in node.parts)
+    assert isinstance(node, P.Star | P.Plus | P.Optional)
+    return 2 + _count(node.inner)
+
+
+@SETTINGS
+@given(regexes)
+def test_thompson_state_count_matches_the_construction_exactly(pattern: str) -> None:
+    from automata_core.regex.parser import parse
+
+    assert len(regex_to_enfa(pattern).automaton.states) == _count(parse(pattern)), pattern

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { EXAMPLES } from '../examples'
 import { addState, emptyAutomaton, setEdgeSymbols } from '../model/automaton'
-import { NO_VIEW, toFlow, type CanvasView } from './canvasMapping'
+import { NO_VIEW, stabilize, toFlow, type CanvasView } from './canvasMapping'
 import { BIDIRECTIONAL_BOW } from './edgeGeometry'
 
 const example = (id: string) => EXAMPLES.find((e) => e.id === id)!.automaton
@@ -191,5 +191,72 @@ describe('toFlow: step-player views', () => {
   it('marks edges read-only on a read-only view', () => {
     expect(toFlow(nfa()).edges.every((e) => !e.data!.readOnly)).toBe(true)
     expect(toFlow(nfa(), view({ readOnly: true })).edges.every((e) => e.data!.readOnly)).toBe(true)
+  })
+})
+
+describe('stabilize', () => {
+  const nfa = () =>
+    setEdgeSymbols(
+      addState(addState(emptyAutomaton('NFA'), { x: 0, y: 0 }), { x: 150, y: 0 }),
+      'q0',
+      'q1',
+      ['a'],
+    )
+
+  it('hands back the previous objects when nothing changed', () => {
+    const memory = new Map()
+    const first = toFlow(nfa())
+    const a = stabilize(first.nodes, memory)
+    const again = stabilize(toFlow(nfa()).nodes, memory)
+    expect(again[0]).toBe(a[0])
+    expect(again[1]).toBe(a[1])
+  })
+
+  it('keeps unaffected elements identical while a selection changes only the selected one', () => {
+    const nodeMemory = new Map()
+    const edgeMemory = new Map()
+    const before = toFlow(nfa())
+    const n1 = stabilize(before.nodes, nodeMemory)
+    const e1 = stabilize(before.edges, edgeMemory)
+
+    const after = toFlow(nfa(), view({ selection: { kind: 'state', id: 'q1' } }))
+    const n2 = stabilize(after.nodes, nodeMemory)
+    const e2 = stabilize(after.edges, edgeMemory)
+
+    expect(n2[0]).toBe(n1[0]) // q0 untouched
+    expect(n2[1]).not.toBe(n1[1]) // q1 is now selected
+    expect(n2[1].selected).toBe(true)
+    expect(e2[0]).toBe(e1[0]) // the edge did not change at all
+  })
+
+  it('notices a moved state, a relabelled state and a highlighted edge', () => {
+    const memory = new Map()
+    const edgeMemory = new Map()
+    const base = nfa()
+    const first = toFlow(base)
+    const n1 = stabilize(first.nodes, memory)
+    const e1 = stabilize(first.edges, edgeMemory)
+
+    const moved = {
+      ...base,
+      states: base.states.map((s) => (s.id === 'q0' ? { ...s, position: { x: 9, y: 9 } } : s)),
+    }
+    expect(stabilize(toFlow(moved).nodes, memory)[0]).not.toBe(n1[0])
+
+    const relabelled = {
+      ...base,
+      states: base.states.map((s) => (s.id === 'q1' ? { ...s, label: 'X' } : s)),
+    }
+    expect(stabilize(toFlow(relabelled).nodes, memory)[1].data.label).toBe('X')
+
+    const lit = toFlow(base, view({ activeTransitions: new Set([0]) }))
+    expect(stabilize(lit.edges, edgeMemory)[0]).not.toBe(e1[0])
+  })
+
+  it('forgets elements that disappeared, so memory does not grow', () => {
+    const memory = new Map()
+    stabilize(toFlow(nfa()).nodes, memory)
+    stabilize(toFlow(emptyAutomaton()).nodes, memory)
+    expect(memory.size).toBe(0)
   })
 })

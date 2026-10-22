@@ -2,6 +2,11 @@ import { ArrowDefs } from './canvas/ArrowDefs'
 import { AutomatonCanvas } from './canvas/AutomatonCanvas'
 import { SymbolPrompt } from './canvas/SymbolPrompt'
 import { Header } from './Header'
+import { HelpDialog } from './HelpDialog'
+import { ProjectsDialog } from './ProjectsDialog'
+import { useShortcuts } from './shortcuts'
+import { TipBar } from './TipBar'
+import { ToastHost } from './ToastHost'
 import { TabBar } from './TabBar'
 import { ComparePane } from './ComparePane'
 import { ConvertPanel } from './panels/ConvertPanel'
@@ -17,6 +22,7 @@ import { useStudioStore, type SideTab } from './store/useStudioStore'
 export default function App() {
   useAutoValidate()
   useAutosave()
+  useShortcuts()
   const tab = useStudioStore((s) => s.sideTab)
   const setTab = useStudioStore.getState().setSideTab
   const replaying = useStudioStore((s) => tab === 'steps' && !!s.records[s.activeTabId])
@@ -50,6 +56,7 @@ export default function App() {
       <div className="flex min-h-0 flex-1">
         <main className="flex min-w-0 flex-1 flex-col" aria-label="Automaton canvas">
           <TabBar />
+          <TipBar />
           <div className="min-h-0 flex-1">
             {comparing ? <ComparePane /> : replaying ? <ReplayView /> : <AutomatonCanvas />}
           </div>
@@ -70,7 +77,7 @@ export default function App() {
                 className={`flex-1 border-b-2 px-1.5 py-2 text-sm font-medium ${
                   tab === t.id
                     ? 'border-blue-600 text-blue-700 dark:text-blue-300'
-                    : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-100'
+                    : 'border-transparent text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100'
                 }`}
               >
                 {t.label}
@@ -98,6 +105,9 @@ export default function App() {
         </aside>
       </div>
       <SymbolPrompt />
+      <ProjectsDialog />
+      <HelpDialog />
+      <ToastHost />
     </div>
   )
 }

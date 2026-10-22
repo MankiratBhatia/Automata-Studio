@@ -1,6 +1,7 @@
 import {
   Background,
   Controls,
+  Panel,
   ReactFlow,
   ReactFlowProvider,
   useReactFlow,
@@ -8,10 +9,20 @@ import {
   type NodeChange,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { EXAMPLES } from '../examples'
+import { nextFreePosition } from '../model/automaton'
 import { NODE_SIZE } from '../model/layout'
+import { useTheme } from '../theme'
 import { useStudioStore } from '../store/useStudioStore'
-import { toFlow, type CanvasView, type StateNode, type TransitionEdge } from './canvasMapping'
+import { registerCanvasExporter, renderCanvas } from './exportImage'
+import {
+  stabilize,
+  toFlow,
+  type CanvasView,
+  type StateNode,
+  type TransitionEdge,
+} from './canvasMapping'
 import { StateNodeComponent } from './StateNode'
 import { TransitionEdgeComponent } from './TransitionEdge'
 
@@ -25,7 +36,17 @@ function Canvas() {
   const trace = useStudioStore((s) => s.sim.trace)
   const step = useStudioStore((s) => s.sim.step)
   const loadId = useStudioStore((s) => s.loadId)
-  const { screenToFlowPosition, fitView } = useReactFlow()
+  const flow = useReactFlow()
+  const { screenToFlowPosition, fitView } = flow
+  const dark = useTheme((s) => s.dark)
+  const canUndo = useStudioStore((s) => (s.history[s.activeTabId]?.past.length ?? 0) > 0)
+  const canRedo = useStudioStore((s) => (s.history[s.activeTabId]?.future.length ?? 0) > 0)
+
+  // Let the header export this canvas as an image (it lives outside this React Flow provider).
+  useEffect(() => {
+    registerCanvasExporter((format) => renderCanvas(flow, format, dark ? '#0f172a' : '#f8fafc'))
+    return () => registerCanvasExporter(null)
+  }, [flow, dark])
 
   const current = trace?.steps[step]
   const view: CanvasView = useMemo(
@@ -38,7 +59,26 @@ function Canvas() {
     }),
     [selection, current, flagged],
   )
-  const { nodes, edges } = useMemo(() => toFlow(doc, view), [doc, view])
+  // Memory that must outlive a render: elements that did not change keep their identity, so
+  // React Flow does not re-measure them (and briefly drop their edges) when something unrelated,
+  // like the selection, changes; and the sizes React Flow has measured are handed back on every
+  // node object, which tells it "still measured". Plain mutable maps, never rendered themselves.
+  const [memo] = useState(() => ({
+    nodes: new Map<string, StateNode>(),
+    edges: new Map<string, TransitionEdge>(),
+    measured: new Map<string, { width: number; height: number }>(),
+  }))
+  const { nodes, edges } = useMemo(() => {
+    const flow = toFlow(doc, view)
+    const withSize = flow.nodes.map((n) => {
+      const m = memo.measured.get(n.id)
+      return m ? { ...n, measured: m } : n
+    })
+    return {
+      nodes: stabilize(withSize, memo.nodes),
+      edges: stabilize(flow.edges, memo.edges),
+    }
+  }, [doc, view, memo])
 
   // Re-fit the view whenever a whole new automaton is loaded (example, import, new).
   useEffect(() => {
@@ -47,17 +87,21 @@ function Canvas() {
     return () => clearTimeout(t)
   }, [loadId, fitView])
 
-  const onNodesChange = useCallback((changes: NodeChange<StateNode>[]) => {
-    const st = useStudioStore.getState()
-    for (const c of changes) {
-      if (c.type === 'position' && c.position) st.moveState(c.id, c.position)
-      else if (c.type === 'select') {
-        const sel = useStudioStore.getState().selection
-        if (c.selected) st.select({ kind: 'state', id: c.id })
-        else if (sel?.kind === 'state' && sel.id === c.id) st.select(null)
-      } else if (c.type === 'remove') st.deleteState(c.id)
-    }
-  }, [])
+  const onNodesChange = useCallback(
+    (changes: NodeChange<StateNode>[]) => {
+      const st = useStudioStore.getState()
+      for (const c of changes) {
+        if (c.type === 'dimensions' && c.dimensions) memo.measured.set(c.id, c.dimensions)
+        else if (c.type === 'position' && c.position) st.moveState(c.id, c.position)
+        else if (c.type === 'select') {
+          const sel = useStudioStore.getState().selection
+          if (c.selected) st.select({ kind: 'state', id: c.id })
+          else if (sel?.kind === 'state' && sel.id === c.id) st.select(null)
+        } else if (c.type === 'remove') st.deleteState(c.id)
+      }
+    },
+    [memo],
+  )
 
   const onEdgesChange = useCallback(
     (changes: EdgeChange<TransitionEdge>[]) => {
@@ -86,6 +130,8 @@ function Canvas() {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         onNodesChange={onNodesChange}
+        onNodeDragStart={() => useStudioStore.getState().beginMove()}
+        colorMode={dark ? 'dark' : 'light'}
         onEdgesChange={onEdgesChange}
         onConnect={(c) => useStudioStore.getState().openPrompt(c.source, c.target)}
         onPaneClick={(e) => {
@@ -102,6 +148,10 @@ function Canvas() {
           if (edge.data) useStudioStore.getState().openPrompt(edge.data.from, edge.data.to)
         }}
         connectionRadius={48}
+        // Selecting an edge must not move it to a new z-index layer: that re-creates every edge
+        // (and its label) in the DOM, which swallows the second click of a double-click.
+        elevateEdgesOnSelect={false}
+        elevateNodesOnSelect={false}
         zoomOnDoubleClick={false}
         deleteKeyCode={['Backspace', 'Delete']}
         multiSelectionKeyCode={null}
@@ -118,16 +168,75 @@ function Canvas() {
       >
         <Background gap={20} />
         <Controls showInteractive={false} />
+        <Panel position="top-left" className="flex gap-1">
+          <button
+            type="button"
+            className="btn bg-white/90 dark:bg-slate-800/90"
+            aria-keyshortcuts="S"
+            title="Add a state (S)"
+            onClick={() =>
+              useStudioStore.getState().addStateAt(nextFreePosition(useStudioStore.getState().doc))
+            }
+          >
+            + State
+          </button>
+          <button
+            type="button"
+            className="btn bg-white/90 dark:bg-slate-800/90"
+            aria-keyshortcuts="Control+Z Meta+Z"
+            title="Undo (Ctrl+Z)"
+            disabled={!canUndo}
+            onClick={() => useStudioStore.getState().undo()}
+          >
+            Undo
+          </button>
+          <button
+            type="button"
+            className="btn bg-white/90 dark:bg-slate-800/90"
+            aria-keyshortcuts="Control+Y Meta+Shift+Z"
+            title="Redo (Ctrl+Y)"
+            disabled={!canRedo}
+            onClick={() => useStudioStore.getState().redo()}
+          >
+            Redo
+          </button>
+        </Panel>
       </ReactFlow>
 
       {doc.states.length === 0 && (
         <div className="pointer-events-none absolute inset-0 grid place-items-center">
-          <div className="max-w-xs text-center text-slate-500">
-            <p className="text-base font-medium">Double-click anywhere to add a state</p>
-            <p className="mt-1 text-sm">
-              Then drag from a state’s blue dot to another state to add a transition. Or load an
-              example from the header.
+          <div className="pointer-events-auto max-w-sm rounded-xl border border-slate-200 bg-white/90 p-5 text-center shadow-sm dark:border-slate-700 dark:bg-slate-800/90">
+            <h2 className="text-base font-semibold">Start an automaton</h2>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+              Double-click anywhere to add a state, then drag from its blue dot to another state to
+              add a transition.
             </p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => {
+                  const ex = EXAMPLES.find((e) => e.id === 'dfa_ends_with_01')
+                  if (ex) useStudioStore.getState().openInNewTab(ex.automaton)
+                }}
+              >
+                Try an example
+              </button>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => useStudioStore.getState().setSideTab('convert')}
+              >
+                Build from a regex
+              </button>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => useStudioStore.getState().setHelpOpen(true)}
+              >
+                Keyboard shortcuts
+              </button>
+            </div>
           </div>
         </div>
       )}

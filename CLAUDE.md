@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Automata Studio: a web app to build, simulate, analyse and convert DFA / NFA / ε-NFA (regex → ε-NFA → DFA → minimal DFA, equivalence checking with counterexamples, step-by-step algorithm replay). Python/FastAPI backend plus React/TypeScript/React Flow frontend. `docs/PLAN.md` is the phased roadmap (Phases 0–4 done; Phase 5 = SQLite projects, undo/redo, export, polish; Phase 6 = PDA/TM). `README.md` has setup and user-facing usage.
+Automata Studio: a web app to build, simulate, analyse and convert DFA / NFA / ε-NFA (regex → ε-NFA → DFA → minimal DFA, equivalence checking with counterexamples, step-by-step algorithm replay). Python/FastAPI backend plus React/TypeScript/React Flow frontend. `docs/PLAN.md` is the phased roadmap (Phases 0–5 done; Phase 6 = PDA/TM). `docs/ALGORITHMS.md` explains each algorithm; `docs/DEMO_SCRIPT.md` is run as an E2E test. `README.md` has setup and user-facing usage.
 
 ## Commands
 
@@ -23,6 +23,7 @@ npm run format:check                 # Prettier; `npx prettier --write src e2e` 
 npm run typecheck && npm test        # Vitest; single file: npx vitest run src/model/replay.test.ts
 npm run build
 npm run e2e                          # Playwright; starts backend + Vite itself. One test: npx playwright test -g "name"
+                                     # Includes axe accessibility checks (e2e/a11y.spec.ts). The backend gets a temp DB (AUTOMATA_DB).
 npm run gen:api                      # regenerate src/api/types.gen.ts + openapi.json from the backend
 ```
 CI (`.github/workflows/ci.yml`) runs all of the above for both halves. It does **not** check that generated API types are current: after changing anything in `backend/app/schemas.py`, run `gen:api` and commit both generated files.
@@ -39,6 +40,7 @@ CI (`.github/workflows/ci.yml`) runs all of the above for both halves. It does *
 
 **Safety limits and determinism.** Subset construction stops at 512 DFA states (`LimitExceededError`); request sizes are capped in `schemas.py`. Engine output must not depend on set/dict iteration order (tests run across hash seeds; sort anything derived from a set).
 
+**Saved projects.** `backend/app/storage.py` is a one-table SQLite store (id, name, kind, json, timestamps). It opens a short-lived connection per call and reads `AUTOMATA_DB` every time, so tests (autouse fixture in `tests/conftest.py`) and E2E (`playwright.config.ts`) redirect it to a temp file and never touch real saved work. E2E tests that save projects must name them `E2E ...` and only delete those.
 **Tests.** `backend/tests/fixtures/*.json` plus `expectations.json` (accept/reject lists) are shared with the frontend: `src/examples/index.ts` imports them via `import.meta.glob` (hence `server.fs.allow` in `vite.config.ts`), so the example gallery, backend tests and E2E tests all use the same automata. Property tests (`tests/property`) check every construction against brute-force language comparison and Python's `re`; they are the main correctness evidence.
 
 ### Frontend
@@ -46,6 +48,10 @@ CI (`.github/workflows/ci.yml`) runs all of the above for both halves. It does *
 - **One Zustand store** (`src/store/useStudioStore.ts`) holds a multi-document workspace: `tabs` + `activeTabId`, with `doc` mirroring the active tab. The active tab's entry in `tabs` may be stale; always go through `syncedTabs` / `selectWorkspace` / `docOfTab`. Per-tab step data lives in `records[tabId]` (session-only, not persisted). Workspace autosaves to localStorage (`store/persistence.ts`, with migration from the Phase 2 single-doc key).
 - **Never write a selector that returns a new array/object each call** (e.g. `selectWorkspace(s).tabs`): Zustand re-renders forever. Select raw fields and derive with `useMemo`.
 - **Pure model code** (`src/model/*`: automaton helpers, layout via dagre, serialize/parse, labels, replay) holds the logic and carries the unit tests; components stay thin.
+- **Undo/redo** is a per-tab history stack inside the store (`history[tabId]`, capped at 100). Every undoable change goes through `edit(next, key?)`; edits with the same `key` within a second merge (typing a label). Pure moves are *not* undoable by themselves: the canvas calls `beginMove()` on drag start so a whole drag is one step.
+- **Canvas element identity matters.** React Flow treats a new node object as changed and re-measures it, which makes attached edges vanish for a frame (and breaks double-click on labels). `AutomatonCanvas` therefore runs `toFlow` output through `stabilize()` and feeds React Flow's measured sizes back into the nodes. Keep it that way when touching the canvas.
+- **Shortcuts** live in `src/shortcuts.ts` (`handleShortcut`, testable without rendering); dialogs use the shared `components/Modal` (focus trap, Escape, focus restore). Theme is `src/theme.ts` (a `dark` class on `<html>`; Tailwind's `dark:` variant is wired to it in `index.css`). Image export (`canvas/exportImage.ts`) must re-attach the shared arrowhead `<marker>` to the cloned viewport, or every exported edge loses its arrow.
+- **Playwright specs import `test` from `e2e/fixtures.ts`**, which fails any test whose page logs a console error or throws (4xx API responses are the only exception).
 - **Canvas.** `canvas/canvasMapping.ts` turns an automaton + a `CanvasView` into React Flow nodes/edges (grouping, curve/loop decisions, ghosts for unbuilt parts, partition groups). Edges are "floating": `TransitionEdge` ignores handles and draws between circle boundaries using the pure geometry in `canvas/edgeGeometry.ts`. `AutomatonCanvas` is the editable canvas; `ReadOnlyCanvas` serves replay and the side-by-side comparison. Don't use React Flow's `fitView` prop on the editable canvas (it re-fits when the first node is added and moves the canvas under the user); fit on `loadId` changes instead.
 
 ## Gotchas

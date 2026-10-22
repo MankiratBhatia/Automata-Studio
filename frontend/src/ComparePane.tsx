@@ -83,14 +83,16 @@ function Side({
           <span
             data-testid={`verdict-${id}`}
             className={`rounded px-2 py-0.5 text-xs font-bold text-white ${
-              trace?.accepted ? 'bg-emerald-600' : 'bg-red-600'
+              trace?.accepted ? 'bg-emerald-700' : 'bg-red-600'
             }`}
           >
             {trace?.accepted ? 'Accepts' : 'Rejects'}
           </span>
         )}
       </div>
-      {'note' in side && <p className="px-3 pb-1 text-xs text-slate-500">{side.note}</p>}
+      {'note' in side && (
+        <p className="px-3 pb-1 text-xs text-slate-600 dark:text-slate-400">{side.note}</p>
+      )}
       <div className="min-h-0 flex-1">
         <ReadOnlyCanvas
           key={`${id}-${doc.name}`}

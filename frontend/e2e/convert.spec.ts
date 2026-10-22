@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Page } from './fixtures.ts'
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 const docTab = (page: Page, name: string) =>
-  page.getByRole('tablist', { name: 'Open automata' }).getByRole('tab', { name, exact: true })
+  page.getByRole('navigation', { name: 'Open automata' }).getByRole('button', { name, exact: true })
 
 const nodes = (page: Page) => page.locator('.react-flow__node')
 
@@ -24,7 +24,7 @@ test('regex pipeline opens ε-NFA, DFA and minimal DFA tabs; the minimal one has
   await expect(docTab(page, 'Thompson: (a|b)*abb')).toBeVisible()
   await expect(docTab(page, 'Thompson: (a|b)*abb (DFA)')).toBeVisible()
   await expect(docTab(page, 'Thompson: (a|b)*abb (DFA) (minimal)')).toHaveAttribute(
-    'aria-selected',
+    'aria-current',
     'true',
   )
 
@@ -48,7 +48,7 @@ test('regex pipeline opens ε-NFA, DFA and minimal DFA tabs; the minimal one has
 test('Build ε-NFA creates one tab', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Regular expression' }).fill('ab*')
   await page.getByRole('button', { name: 'Build ε-NFA' }).click()
-  await expect(docTab(page, 'Thompson: ab*')).toHaveAttribute('aria-selected', 'true')
+  await expect(docTab(page, 'Thompson: ab*')).toHaveAttribute('aria-current', 'true')
   await expect(page.getByTestId('convert-note')).toContainText('Built an ε-NFA with 6 states.')
 })
 
@@ -58,7 +58,9 @@ test('a syntax error points at the offending character and creates nothing', asy
   const alert = page.getByRole('alert')
   await expect(alert).toContainText('regex ended')
   await expect(alert.locator('pre')).toHaveText('a(b|\n    ^')
-  await expect(page.getByRole('tablist', { name: 'Open automata' }).getByRole('tab')).toHaveCount(1)
+  await expect(
+    page.getByRole('navigation', { name: 'Open automata' }).getByRole('listitem'),
+  ).toHaveCount(1)
 })
 
 test('NFA → DFA: the third-last-symbol NFA blows up to 8 states', async ({ page }) => {
@@ -69,10 +71,7 @@ test('NFA → DFA: the third-last-symbol NFA blows up to 8 states', async ({ pag
   await page.getByRole('button', { name: 'Convert to DFA' }).click()
   await expect(page.getByTestId('convert-note')).toContainText('4 NFA states → 8 DFA states.')
   await expect(nodes(page)).toHaveCount(8)
-  await expect(docTab(page, 'Third-last symbol is a (DFA)')).toHaveAttribute(
-    'aria-selected',
-    'true',
-  )
+  await expect(docTab(page, 'Third-last symbol is a (DFA)')).toHaveAttribute('aria-current', 'true')
   // Subset states are lettered, and a key says which NFA states each letter stands for.
   await expect(page.getByTestId('state-A')).toBeVisible()
   const key = page.getByRole('region', { name: 'State key' })
@@ -118,20 +117,18 @@ test('Minimise is refused for an NFA and Convert-to-DFA for a DFA', async ({ pag
 test('tabs keep their own work, and survive a refresh', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Regular expression' }).fill('ab')
   await page.getByRole('button', { name: 'Run full pipeline' }).click()
-  await expect(docTab(page, 'Thompson: ab (DFA) (minimal)')).toHaveAttribute(
-    'aria-selected',
-    'true',
-  )
+  await expect(docTab(page, 'Thompson: ab (DFA) (minimal)')).toHaveAttribute('aria-current', 'true')
   await page.waitForTimeout(600) // autosave is debounced
   await page.reload()
-  await expect(page.getByRole('tablist', { name: 'Open automata' }).getByRole('tab')).toHaveCount(3)
-  await expect(docTab(page, 'Thompson: ab (DFA) (minimal)')).toHaveAttribute(
-    'aria-selected',
-    'true',
-  )
+  await expect(
+    page.getByRole('navigation', { name: 'Open automata' }).getByRole('listitem'),
+  ).toHaveCount(3)
+  await expect(docTab(page, 'Thompson: ab (DFA) (minimal)')).toHaveAttribute('aria-current', 'true')
   await docTab(page, 'Thompson: ab').click()
   await expect(nodes(page)).toHaveCount(4)
 
   await page.getByRole('button', { name: 'Close Thompson: ab', exact: true }).click()
-  await expect(page.getByRole('tablist', { name: 'Open automata' }).getByRole('tab')).toHaveCount(2)
+  await expect(
+    page.getByRole('navigation', { name: 'Open automata' }).getByRole('listitem'),
+  ).toHaveCount(2)
 })

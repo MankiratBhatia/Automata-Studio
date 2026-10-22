@@ -2,18 +2,24 @@ import { create } from 'zustand'
 import {
   ApiError,
   checkEquivalence,
+  createProject,
+  deleteProject,
+  getProject,
+  listProjects,
   minimizeDfa,
   nfaToDfa,
   regexToNfa,
   removeEpsilon,
   simulate,
   simulateBatch,
+  updateProject,
 } from '../api/client'
 import type {
   BatchResponse,
   ConvertResponse,
   EquivalenceResponse,
   Issue,
+  ProjectSummary,
   SimulateResponse,
 } from '../api/types'
 import * as M from '../model/automaton'
@@ -51,10 +57,32 @@ interface BatchState {
 export interface DocTab {
   id: string
   doc: Automaton
+  /** The saved project this tab came from or was last saved as. */
+  projectId?: string
+  /** The document as of the last save; differing from the live one means unsaved changes. */
+  saved?: Automaton
+}
+
+interface History {
+  past: Automaton[]
+  future: Automaton[]
+}
+
+interface ProjectsState {
+  open: boolean
+  loading: boolean
+  error: string | null
+  items: ProjectSummary[] | null
 }
 
 /** The operations that start from the automaton on screen (regex has no input automaton). */
 export type SingleConversion = Exclude<ConversionOp, 'regex'>
+
+export interface Toast {
+  id: number
+  kind: 'error' | 'success' | 'info'
+  message: string
+}
 
 export type SideTab = 'edit' | 'validate' | 'simulate' | 'convert' | 'steps' | 'compare'
 
@@ -108,6 +136,11 @@ interface StudioState {
   batch: BatchState
   convert: ConvertState
   sideTab: SideTab
+  toasts: Toast[]
+  /** Undo/redo stacks, one pair per tab. */
+  history: Record<string, History>
+  projects: ProjectsState
+  helpOpen: boolean
   /** Step-player data for the tab each conversion opened. Not saved across reloads. */
   records: Record<string, ConversionRecord>
   player: PlayerState
@@ -138,6 +171,20 @@ interface StudioState {
   closeTab: (id: string) => void
 
   setSideTab: (tab: SideTab) => void
+  setHelpOpen: (open: boolean) => void
+  undo: () => void
+  redo: () => void
+  /** Call once when a drag starts, so the whole drag is a single undo step. */
+  beginMove: () => void
+
+  openProjects: () => void
+  closeProjects: () => void
+  refreshProjects: () => Promise<void>
+  saveProject: () => Promise<void>
+  openProject: (id: string) => Promise<void>
+  removeProject: (id: string) => Promise<void>
+  showToast: (kind: Toast['kind'], message: string) => void
+  dismissToast: (id: number) => void
   gotoPlayerStep: (n: number) => void
   setPlayerPlaying: (playing: boolean) => void
 
@@ -164,6 +211,12 @@ interface StudioState {
   runBatch: () => Promise<void>
 }
 
+let toastCounter = 0
+const HISTORY_LIMIT = 100
+const COALESCE_MS = 1000
+const NO_HISTORY: History = { past: [], future: [] }
+/** The last undoable edit, so rapid repeats (typing a label) merge into one undo step. */
+let lastEdit: { key: string; at: number } | null = null
 const IDLE_PLAYER: PlayerState = { index: 0, playing: false }
 const IDLE_COMPARE: Omit<CompareState, 'aId' | 'bId'> = {
   running: false,
@@ -231,9 +284,25 @@ export const useStudioStore = create<StudioState>()((set, get) => {
    * Apply an edit. Anything but a pure move changes the language, so a finished simulation
    * (which describes the old automaton) is discarded rather than left lying about.
    */
-  const edit = (next: Automaton) =>
+  /** Push the current document onto the undo stack (unless this edit merges with the last). */
+  const withHistory = (st: StudioState, key?: string): Pick<StudioState, 'history'> => {
+    const now = Date.now()
+    const merge = key !== undefined && lastEdit?.key === key && now - lastEdit.at < COALESCE_MS
+    lastEdit = key === undefined ? null : { key, at: now }
+    if (merge) return { history: st.history }
+    const h = st.history[st.activeTabId] ?? NO_HISTORY
+    return {
+      history: {
+        ...st.history,
+        [st.activeTabId]: { past: [...h.past, st.doc].slice(-HISTORY_LIMIT), future: [] },
+      },
+    }
+  }
+
+  const edit = (next: Automaton, key?: string) =>
     set((st) => ({
       doc: next,
+      ...withHistory(st, key),
       selection: sanitize(st.selection, next),
       flagged: NO_FLAG,
       sim: { ...st.sim, ...IDLE_SIM },
@@ -273,7 +342,7 @@ export const useStudioStore = create<StudioState>()((set, get) => {
 
   const saved = loadWorkspace()
   const initialTabs: DocTab[] = saved
-    ? saved.tabs.map((t) => ({ id: t.id, doc: ensurePositions(t.doc) }))
+    ? saved.tabs.map((t) => ({ id: t.id, doc: ensurePositions(t.doc), projectId: t.projectId }))
     : [{ id: newTabId(), doc: M.emptyAutomaton() }]
   const initialActive = saved?.activeId ?? initialTabs[0].id
 
@@ -313,6 +382,10 @@ export const useStudioStore = create<StudioState>()((set, get) => {
     batch: { text: '', results: null, running: false, error: null },
     convert: { running: false, regexError: null, error: null, note: null },
     sideTab: 'edit',
+    toasts: [],
+    history: {},
+    projects: { open: false, loading: false, error: null, items: null },
+    helpOpen: false,
     records: {},
     player: IDLE_PLAYER,
     compare: { aId: null, bId: null, ...IDLE_COMPARE },
@@ -326,11 +399,11 @@ export const useStudioStore = create<StudioState>()((set, get) => {
     deleteState: (id) => edit(M.removeState(get().doc, id)),
     deleteEdge: (from, to) => edit(M.removeEdge(get().doc, from, to)),
     moveState: (id, position) => set((st) => ({ doc: M.moveState(st.doc, id, position) })),
-    renameState: (id, label) => edit(M.renameState(get().doc, id, label)),
+    renameState: (id, label) => edit(M.renameState(get().doc, id, label), `label:${id}`),
     toggleAccepting: (id) => edit(M.toggleAccepting(get().doc, id)),
     setStart: (id) => edit(M.setStart(get().doc, id)),
     setKind: (kind) => edit(M.setKind(get().doc, kind)),
-    setName: (name) => set((st) => ({ doc: M.setName(st.doc, name) })),
+    setName: (name) => set((st) => ({ doc: M.setName(st.doc, name), ...withHistory(st, 'name') })),
     setAlphabet: (alphabet) => edit(M.setAlphabet(get().doc, alphabet)),
     addTrapState: () => edit(M.addTrapState(get().doc)),
 
@@ -357,6 +430,7 @@ export const useStudioStore = create<StudioState>()((set, get) => {
         sim: { ...st.sim, ...IDLE_SIM },
         batch: { ...st.batch, results: null, error: null },
         player: IDLE_PLAYER,
+        history: { ...st.history, [st.activeTabId]: NO_HISTORY },
       }))
     },
     newDoc: () => get().loadDoc(M.emptyAutomaton()),
@@ -402,17 +476,159 @@ export const useStudioStore = create<StudioState>()((set, get) => {
         }
         const rest = tabs.filter((t) => t.id !== id)
         const { [id]: _gone, ...records } = st.records
+        const { [id]: _h, ...history } = st.history
         // A comparison that involved the closed tab no longer means anything.
         const compare =
           st.compare.aId === id || st.compare.bId === id
             ? { aId: null, bId: null, ...IDLE_COMPARE }
             : st.compare
-        if (id !== st.activeTabId) return { tabs: rest, records, compare }
+        if (id !== st.activeTabId) return { tabs: rest, records, history, compare }
         const next = rest[Math.min(index, rest.length - 1)]
-        return { tabs: rest, activeTabId: next.id, doc: next.doc, records, compare, ...fresh(st) }
+        return {
+          tabs: rest,
+          activeTabId: next.id,
+          doc: next.doc,
+          records,
+          history,
+          compare,
+          ...fresh(st),
+        }
       }),
 
     setSideTab: (sideTab) => set({ sideTab }),
+    setHelpOpen: (helpOpen) => set({ helpOpen }),
+
+    beginMove: () => set((st) => withHistory(st)),
+    undo: () =>
+      set((st) => {
+        const h = st.history[st.activeTabId]
+        if (!h || h.past.length === 0) return {}
+        const previous = h.past[h.past.length - 1]
+        lastEdit = null
+        return {
+          doc: previous,
+          history: {
+            ...st.history,
+            [st.activeTabId]: { past: h.past.slice(0, -1), future: [st.doc, ...h.future] },
+          },
+          selection: sanitize(st.selection, previous),
+          flagged: NO_FLAG,
+          prompt: null,
+          sim: { ...st.sim, ...IDLE_SIM },
+          batch: { ...st.batch, results: null, error: null },
+        }
+      }),
+    redo: () =>
+      set((st) => {
+        const h = st.history[st.activeTabId]
+        if (!h || h.future.length === 0) return {}
+        const [next, ...rest] = h.future
+        lastEdit = null
+        return {
+          doc: next,
+          history: {
+            ...st.history,
+            [st.activeTabId]: { past: [...h.past, st.doc].slice(-HISTORY_LIMIT), future: rest },
+          },
+          selection: sanitize(st.selection, next),
+          flagged: NO_FLAG,
+          prompt: null,
+          sim: { ...st.sim, ...IDLE_SIM },
+          batch: { ...st.batch, results: null, error: null },
+        }
+      }),
+
+    openProjects: () => {
+      set((st) => ({ projects: { ...st.projects, open: true } }))
+      void get().refreshProjects()
+    },
+    closeProjects: () => set((st) => ({ projects: { ...st.projects, open: false } })),
+    refreshProjects: async () => {
+      set((st) => ({ projects: { ...st.projects, loading: true, error: null } }))
+      try {
+        const items = await listProjects()
+        set((st) => ({ projects: { ...st.projects, loading: false, items } }))
+      } catch (e) {
+        set((st) => ({ projects: { ...st.projects, loading: false, error: describeError(e) } }))
+      }
+    },
+    saveProject: async () => {
+      const start = get()
+      const doc = start.doc
+      const tabId = start.activeTabId
+      if (doc.states.length === 0) {
+        get().showToast('info', 'Nothing to save yet. Add a state first.')
+        return
+      }
+      const link = (projectId: string | undefined, saved: Automaton | undefined) =>
+        set((st) => ({
+          tabs: st.tabs.map((t) => (t.id === tabId ? { ...t, projectId, saved } : t)),
+        }))
+      try {
+        const existing = start.tabs.find((t) => t.id === tabId)?.projectId
+        let project
+        try {
+          project = existing ? await updateProject(existing, doc) : await createProject(doc)
+        } catch (e) {
+          // The project was deleted somewhere else: keep the user's work by saving it anew.
+          if (existing && e instanceof ApiError && e.code === 'NOT_FOUND') {
+            project = await createProject(doc)
+          } else throw e
+        }
+        link(project.id, doc)
+        get().showToast('success', `Saved “${project.name}”.`)
+        if (get().projects.open) void get().refreshProjects()
+      } catch (e) {
+        get().showToast(
+          'error',
+          `Could not save: ${describeError(e)} Your work is still kept in this browser.`,
+        )
+      }
+    },
+    openProject: async (id) => {
+      const open = get().tabs.find((t) => t.projectId === id)
+      if (open) {
+        get().switchTab(open.id)
+        get().closeProjects()
+        return
+      }
+      try {
+        const project = await getProject(id)
+        get().openInNewTab(project.automaton)
+        const tabId = get().activeTabId
+        const doc = get().doc
+        set((st) => ({
+          tabs: st.tabs.map((t) => (t.id === tabId ? { ...t, projectId: id, saved: doc } : t)),
+        }))
+        get().closeProjects()
+        get().showToast('success', `Opened “${project.name}”.`)
+      } catch (e) {
+        get().showToast('error', `Could not open that project: ${describeError(e)}`)
+        void get().refreshProjects()
+      }
+    },
+    removeProject: async (id) => {
+      try {
+        await deleteProject(id)
+        // Tabs that were linked to it become ordinary unsaved tabs.
+        set((st) => ({
+          tabs: st.tabs.map((t) =>
+            t.projectId === id ? { ...t, projectId: undefined, saved: undefined } : t,
+          ),
+        }))
+        get().showToast('info', 'Project deleted.')
+      } catch (e) {
+        get().showToast('error', `Could not delete: ${describeError(e)}`)
+      }
+      void get().refreshProjects()
+    },
+    showToast: (kind, message) => {
+      const id = ++toastCounter
+      set((st) => ({ toasts: [...st.toasts.slice(-3), { id, kind, message }] }))
+      // Errors stay longer: they usually need reading twice.
+      setTimeout(() => get().dismissToast(id), kind === 'error' ? 8000 : 4000)
+    },
+    dismissToast: (id) => set((st) => ({ toasts: st.toasts.filter((t) => t.id !== id) })),
     gotoPlayerStep: (n) =>
       set((st) => {
         const record = st.records[st.activeTabId]

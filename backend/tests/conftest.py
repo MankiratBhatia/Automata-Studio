@@ -26,3 +26,11 @@ def load_raw(name: str) -> dict:  # type: ignore[type-arg]
 settings.register_profile("default", max_examples=100, deadline=None)
 settings.register_profile("thorough", max_examples=500, deadline=None)
 settings.load_profile(os.environ.get("HYPOTHESIS_PROFILE", "default"))
+
+
+@pytest.fixture(autouse=True)
+def isolated_database(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Every test gets its own empty project database, so none can touch real saved work."""
+    db = tmp_path / "projects.sqlite3"
+    monkeypatch.setenv("AUTOMATA_DB", str(db))
+    return db

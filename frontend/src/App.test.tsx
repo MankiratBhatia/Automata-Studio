@@ -28,13 +28,14 @@ describe('App', () => {
     expect(await screen.findByText('Backend offline')).toBeInTheDocument()
   })
 
-  it('offers the example gallery and the three panels', () => {
+  it('offers the example gallery, the side tabs and a guided empty state', () => {
     backend('ok')
     render(<App />)
     expect(screen.getByRole('combobox', { name: 'Load example' })).toBeInTheDocument()
-    for (const name of ['Edit', 'Validate', 'Simulate']) {
+    for (const name of ['Edit', 'Validate', 'Simulate', 'Convert', 'Steps', 'Compare']) {
       expect(screen.getByRole('tab', { name })).toBeInTheDocument()
     }
-    expect(screen.getByText('Double-click anywhere to add a state')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Start an automaton' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Try an example' })).toBeInTheDocument()
   })
 })

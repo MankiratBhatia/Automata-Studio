@@ -60,7 +60,7 @@ function PromptDialog({ from, to }: { from: string; to: string }) {
             className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-mono dark:border-slate-600 dark:bg-slate-900"
           />
         </label>
-        <p id="symbol-prompt-hint" className="mt-1 text-xs text-slate-500">
+        <p id="symbol-prompt-hint" className="mt-1 text-xs text-slate-600 dark:text-slate-400">
           Single characters separated by commas.
           {doc.kind === 'ENFA' ? ' Type ε (or eps) for an epsilon transition.' : ''}
         </p>

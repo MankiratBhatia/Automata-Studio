@@ -1,8 +1,10 @@
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { useBackendStatus } from './api/useBackendStatus'
 import { EXAMPLES } from './examples'
-import { ParseError, parseAutomaton, serializeAutomaton } from './model/serialize'
+import { ExportMenu } from './ExportMenu'
+import { ParseError, parseAutomaton } from './model/serialize'
 import { useStudioStore } from './store/useStudioStore'
+import { useTheme, type ThemePref } from './theme'
 
 const DOT: Record<string, string> = {
   checking: 'bg-amber-400',
@@ -10,36 +12,19 @@ const DOT: Record<string, string> = {
   offline: 'bg-red-500',
 }
 
-function download(name: string, text: string) {
-  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
-  const a = document.createElement('a')
-  a.href = url
-  a.download = name
-  a.click()
-  URL.revokeObjectURL(url)
-}
-
 export function Header() {
   const status = useBackendStatus()
   const fileInput = useRef<HTMLInputElement>(null)
-  const [notice, setNotice] = useState<string | null>(null)
-
-  const onExport = () => {
-    const doc = useStudioStore.getState().doc
-    const slug = doc.name
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
-    download(`${slug || 'automaton'}.json`, serializeAutomaton(doc))
-  }
+  const pref = useTheme((s) => s.pref)
+  const setPref = useTheme((s) => s.setPref)
 
   const onImport = async (file: File) => {
+    const st = useStudioStore.getState()
     try {
-      useStudioStore.getState().openInNewTab(parseAutomaton(await file.text()))
-      setNotice(null)
+      st.openInNewTab(parseAutomaton(await file.text()))
     } catch (e) {
-      setNotice(
+      st.showToast(
+        'error',
         e instanceof ParseError
           ? `Could not import ${file.name}: ${e.message}`
           : 'Could not read that file.',
@@ -60,7 +45,7 @@ export function Header() {
               const ex = EXAMPLES.find((x) => x.id === e.target.value)
               if (ex) useStudioStore.getState().openInNewTab(ex.automaton)
             }}
-            className="btn dark:bg-slate-900"
+            className="btn w-44 dark:bg-slate-900"
           >
             <option value="">Examples…</option>
             {EXAMPLES.map((ex) => (
@@ -75,8 +60,26 @@ export function Header() {
           <button type="button" className="btn" onClick={() => fileInput.current?.click()}>
             Import
           </button>
-          <button type="button" className="btn" onClick={onExport}>
-            Export
+          <ExportMenu />
+          <span
+            className="mx-1 hidden h-5 w-px bg-slate-300 sm:inline-block dark:bg-slate-600"
+            aria-hidden
+          />
+          <button
+            type="button"
+            className="btn"
+            onClick={() => useStudioStore.getState().openProjects()}
+          >
+            Projects
+          </button>
+          <button
+            type="button"
+            className="btn"
+            aria-keyshortcuts="Control+S Meta+S"
+            title="Save this tab as a project (Ctrl+S)"
+            onClick={() => void useStudioStore.getState().saveProject()}
+          >
+            Save
           </button>
           <input
             ref={fileInput}
@@ -92,27 +95,37 @@ export function Header() {
           />
         </div>
 
-        <div className="ml-auto flex items-center gap-2 text-sm" role="status" aria-live="polite">
-          <span className={`h-2.5 w-2.5 rounded-full ${DOT[status.state]}`} aria-hidden />
-          <span>
-            {status.state === 'checking' && 'Connecting…'}
-            {status.state === 'connected' && `Backend connected (v${status.version})`}
-            {status.state === 'offline' && 'Backend offline'}
-          </span>
+        <div className="ml-auto flex items-center gap-3 text-sm">
+          <select
+            aria-label="Theme"
+            value={pref}
+            onChange={(e) => setPref(e.target.value as ThemePref)}
+            className="btn dark:bg-slate-900"
+          >
+            <option value="system">Theme: System</option>
+            <option value="light">Theme: Light</option>
+            <option value="dark">Theme: Dark</option>
+          </select>
+          <button
+            type="button"
+            className="btn"
+            aria-label="Keyboard shortcuts"
+            aria-keyshortcuts="?"
+            title="Keyboard shortcuts (?)"
+            onClick={() => useStudioStore.getState().setHelpOpen(true)}
+          >
+            ?
+          </button>
+          <div className="flex items-center gap-2" role="status" aria-live="polite">
+            <span className={`h-2.5 w-2.5 rounded-full ${DOT[status.state]}`} aria-hidden />
+            <span>
+              {status.state === 'checking' && 'Connecting…'}
+              {status.state === 'connected' && `Backend connected (v${status.version})`}
+              {status.state === 'offline' && 'Backend offline'}
+            </span>
+          </div>
         </div>
       </div>
-
-      {notice && (
-        <p
-          role="alert"
-          className="flex items-center justify-between gap-4 bg-red-100 px-4 py-2 text-sm text-red-800 dark:bg-red-950 dark:text-red-200"
-        >
-          {notice}
-          <button type="button" className="underline" onClick={() => setNotice(null)}>
-            Dismiss
-          </button>
-        </p>
-      )}
     </header>
   )
 }

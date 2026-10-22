@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Page } from './fixtures.ts'
 
 /** Drag from a state's connection dot onto another state (or itself). */
 async function connect(page: Page, from: string, to: string) {
@@ -18,6 +18,12 @@ async function setSymbols(page: Page, text: string) {
   await dialog.getByRole('textbox').fill(text)
   await dialog.getByRole('button', { name: 'Save' }).click()
   await expect(dialog).toBeHidden()
+}
+
+/** Open the Export menu and pick one of its items. */
+async function exportAs(page: Page, item: string) {
+  await page.getByRole('button', { name: /^Export/ }).click()
+  await page.getByRole('button', { name: item }).click()
 }
 
 test.beforeEach(async ({ page }) => {
@@ -111,7 +117,7 @@ test('export then import gives the same automaton', async ({ page }) => {
   await expect(page.getByTestId('state-10')).toBeVisible()
   const [download] = await Promise.all([
     page.waitForEvent('download'),
-    page.getByRole('button', { name: 'Export' }).click(),
+    exportAs(page, 'Automaton file (.json)'),
   ])
   const path = await download.path()
 

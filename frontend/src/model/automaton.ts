@@ -208,3 +208,18 @@ export function addTrapState(doc: Automaton): Automaton {
     ],
   }
 }
+
+/** A spot for a new state that does not sit on top of an existing one. */
+export function nextFreePosition(doc: Automaton): { x: number; y: number } {
+  const GAP = 130
+  const CLEAR = 90
+  for (let n = 0; n < 500; n++) {
+    const x = 80 + (n % 6) * GAP
+    const y = 120 + Math.floor(n / 6) * GAP
+    const taken = doc.states.some(
+      (s) => s.position && Math.abs(s.position.x - x) < CLEAR && Math.abs(s.position.y - y) < CLEAR,
+    )
+    if (!taken) return { x, y }
+  }
+  return { x: 80, y: 120 }
+}
