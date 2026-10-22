@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "kind": "DFA",
+  "name": "Even number of 1s, except rejects 00",
+  "alphabet": [
+    "0",
+    "1"
+  ],
+  "states": [
+    {
+      "id": "s",
+      "label": "s"
+    },
+    {
+      "id": "z1",
+      "label": "z1"
+    },
+    {
+      "id": "z2",
+      "label": "z2"
+    },
+    {
+      "id": "e",
+      "label": "e"
+    },
+    {
+      "id": "o",
+      "label": "o"
+    }
+  ],
+  "start": "s",
+  "accepting": [
+    "s",
+    "z1",
+    "e"
+  ],
+  "transitions": [
+    {
+      "from": "s",
+      "to": "z1",
+      "symbol": "0"
+    },
+    {
+      "from": "s",
+      "to": "o",
+      "symbol": "1"
+    },
+    {
+      "from": "z1",
+      "to": "z2",
+      "symbol": "0"
+    },
+    {
+      "from": "z1",
+      "to": "o",
+      "symbol": "1"
+    },
+    {
+      "from": "z2",
+      "to": "e",
+      "symbol": "0"
+    },
+    {
+      "from": "z2",
+      "to": "o",
+      "symbol": "1"
+    },
+    {
+      "from": "e",
+      "to": "e",
+      "symbol": "0"
+    },
+    {
+      "from": "e",
+      "to": "o",
+      "symbol": "1"
+    },
+    {
+      "from": "o",
+      "to": "o",
+      "symbol": "0"
+    },
+    {
+      "from": "o",
+      "to": "e",
+      "symbol": "1"
+    }
+  ]
+}

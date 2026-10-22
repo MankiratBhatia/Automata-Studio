@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "kind": "DFA",
+  "name": "Non-minimal DFA (B~C, U unreachable)",
+  "alphabet": [
+    "a",
+    "b"
+  ],
+  "states": [
+    {
+      "id": "A",
+      "label": "A"
+    },
+    {
+      "id": "B",
+      "label": "B"
+    },
+    {
+      "id": "C",
+      "label": "C"
+    },
+    {
+      "id": "D",
+      "label": "D"
+    },
+    {
+      "id": "E",
+      "label": "E"
+    },
+    {
+      "id": "U",
+      "label": "U"
+    }
+  ],
+  "start": "A",
+  "accepting": [
+    "D"
+  ],
+  "transitions": [
+    {
+      "from": "A",
+      "to": "B",
+      "symbol": "a"
+    },
+    {
+      "from": "A",
+      "to": "C",
+      "symbol": "b"
+    },
+    {
+      "from": "B",
+      "to": "D",
+      "symbol": "a"
+    },
+    {
+      "from": "B",
+      "to": "E",
+      "symbol": "b"
+    },
+    {
+      "from": "C",
+      "to": "D",
+      "symbol": "a"
+    },
+    {
+      "from": "C",
+      "to": "E",
+      "symbol": "b"
+    },
+    {
+      "from": "D",
+      "to": "D",
+      "symbol": "a"
+    },
+    {
+      "from": "D",
+      "to": "E",
+      "symbol": "b"
+    },
+    {
+      "from": "E",
+      "to": "E",
+      "symbol": "a"
+    },
+    {
+      "from": "E",
+      "to": "E",
+      "symbol": "b"
+    },
+    {
+      "from": "U",
+      "to": "A",
+      "symbol": "a"
+    },
+    {
+      "from": "U",
+      "to": "A",
+      "symbol": "b"
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "kind": "ENFA",
+  "name": "(a|b)*abb (Thompson)",
+  "alphabet": [
+    "a",
+    "b"
+  ],
+  "states": [
+    {
+      "id": "0",
+      "label": "0"
+    },
+    {
+      "id": "1",
+      "label": "1"
+    },
+    {
+      "id": "2",
+      "label": "2"
+    },
+    {
+      "id": "3",
+      "label": "3"
+    },
+    {
+      "id": "4",
+      "label": "4"
+    },
+    {
+      "id": "5",
+      "label": "5"
+    },
+    {
+      "id": "6",
+      "label": "6"
+    },
+    {
+      "id": "7",
+      "label": "7"
+    },
+    {
+      "id": "8",
+      "label": "8"
+    },
+    {
+      "id": "9",
+      "label": "9"
+    },
+    {
+      "id": "10",
+      "label": "10"
+    }
+  ],
+  "start": "0",
+  "accepting": [
+    "10"
+  ],
+  "transitions": [
+    {
+      "from": "0",
+      "to": "1",
+      "symbol": null
+    },
+    {
+      "from": "0",
+      "to": "7",
+      "symbol": null
+    },
+    {
+      "from": "1",
+      "to": "2",
+      "symbol": null
+    },
+    {
+      "from": "1",
+      "to": "4",
+      "symbol": null
+    },
+    {
+      "from": "2",
+      "to": "3",
+      "symbol": "a"
+    },
+    {
+      "from": "4",
+      "to": "5",
+      "symbol": "b"
+    },
+    {
+      "from": "3",
+      "to": "6",
+      "symbol": null
+    },
+    {
+      "from": "5",
+      "to": "6",
+      "symbol": null
+    },
+    {
+      "from": "6",
+      "to": "1",
+      "symbol": null
+    },
+    {
+      "from": "6",
+      "to": "7",
+      "symbol": null
+    },
+    {
+      "from": "7",
+      "to": "8",
+      "symbol": "a"
+    },
+    {
+      "from": "8",
+      "to": "9",
+      "symbol": "b"
+    },
+    {
+      "from": "9",
+      "to": "10",
+      "symbol": "b"
+    }
+  ]
+}

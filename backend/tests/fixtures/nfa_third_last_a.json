@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "kind": "NFA",
+  "name": "Third-last symbol is a",
+  "alphabet": [
+    "a",
+    "b"
+  ],
+  "states": [
+    {
+      "id": "q0",
+      "label": "q0"
+    },
+    {
+      "id": "q1",
+      "label": "q1"
+    },
+    {
+      "id": "q2",
+      "label": "q2"
+    },
+    {
+      "id": "q3",
+      "label": "q3"
+    }
+  ],
+  "start": "q0",
+  "accepting": [
+    "q3"
+  ],
+  "transitions": [
+    {
+      "from": "q0",
+      "to": "q0",
+      "symbol": "a"
+    },
+    {
+      "from": "q0",
+      "to": "q0",
+      "symbol": "b"
+    },
+    {
+      "from": "q0",
+      "to": "q1",
+      "symbol": "a"
+    },
+    {
+      "from": "q1",
+      "to": "q2",
+      "symbol": "a"
+    },
+    {
+      "from": "q1",
+      "to": "q2",
+      "symbol": "b"
+    },
+    {
+      "from": "q2",
+      "to": "q3",
+      "symbol": "a"
+    },
+    {
+      "from": "q2",
+      "to": "q3",
+      "symbol": "b"
+    }
+  ]
+}

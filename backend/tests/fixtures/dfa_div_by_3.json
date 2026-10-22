@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "kind": "DFA",
+  "name": "Binary divisible by 3",
+  "alphabet": [
+    "0",
+    "1"
+  ],
+  "states": [
+    {
+      "id": "r0",
+      "label": "r0"
+    },
+    {
+      "id": "r1",
+      "label": "r1"
+    },
+    {
+      "id": "r2",
+      "label": "r2"
+    }
+  ],
+  "start": "r0",
+  "accepting": [
+    "r0"
+  ],
+  "transitions": [
+    {
+      "from": "r0",
+      "to": "r0",
+      "symbol": "0"
+    },
+    {
+      "from": "r0",
+      "to": "r1",
+      "symbol": "1"
+    },
+    {
+      "from": "r1",
+      "to": "r2",
+      "symbol": "0"
+    },
+    {
+      "from": "r1",
+      "to": "r0",
+      "symbol": "1"
+    },
+    {
+      "from": "r2",
+      "to": "r1",
+      "symbol": "0"
+    },
+    {
+      "from": "r2",
+      "to": "r2",
+      "symbol": "1"
+    }
+  ]
+}

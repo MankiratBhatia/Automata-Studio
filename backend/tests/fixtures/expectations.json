@@ -1,0 +1,110 @@
+{
+  "dfa_ends_with_01": {
+    "accept": [
+      "01",
+      "101",
+      "0001",
+      "1101"
+    ],
+    "reject": [
+      "",
+      "0",
+      "1",
+      "10",
+      "011",
+      "010"
+    ]
+  },
+  "dfa_div_by_3": {
+    "accept": [
+      "",
+      "0",
+      "11",
+      "110",
+      "1001",
+      "1111"
+    ],
+    "reject": [
+      "1",
+      "10",
+      "100",
+      "101",
+      "111"
+    ]
+  },
+  "nfa_third_last_a": {
+    "accept": [
+      "aaa",
+      "abb",
+      "baab",
+      "bbabb"
+    ],
+    "reject": [
+      "",
+      "a",
+      "ab",
+      "bbb",
+      "baa",
+      "abab"
+    ]
+  },
+  "enfa_abb_thompson": {
+    "accept": [
+      "abb",
+      "aabb",
+      "babb",
+      "ababb"
+    ],
+    "reject": [
+      "",
+      "ab",
+      "abba",
+      "bb",
+      "aab"
+    ]
+  },
+  "dfa_non_minimal": {
+    "accept": [
+      "aa",
+      "ba",
+      "aaa",
+      "baa"
+    ],
+    "reject": [
+      "",
+      "a",
+      "b",
+      "ab",
+      "bb",
+      "aab",
+      "bbba"
+    ]
+  },
+  "dfa_even_ones": {
+    "accept": [
+      "",
+      "0",
+      "11",
+      "0110"
+    ],
+    "reject": [
+      "1",
+      "10",
+      "111"
+    ]
+  },
+  "dfa_even_ones_but_not_00": {
+    "accept": [
+      "",
+      "0",
+      "11",
+      "000",
+      "0110"
+    ],
+    "reject": [
+      "00",
+      "1",
+      "111"
+    ]
+  }
+}

@@ -1,0 +1,1112 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Automata Studio API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/validate": {
+      "post": {
+        "tags": [
+          "analyze"
+        ],
+        "summary": "Validate Automaton",
+        "operationId": "validate_automaton_api_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Automaton"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simulate": {
+      "post": {
+        "tags": [
+          "analyze"
+        ],
+        "summary": "Simulate Input",
+        "operationId": "simulate_input_api_simulate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simulate/batch": {
+      "post": {
+        "tags": [
+          "analyze"
+        ],
+        "summary": "Simulate Many",
+        "operationId": "simulate_many_api_simulate_batch_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/equivalence": {
+      "post": {
+        "tags": [
+          "analyze"
+        ],
+        "summary": "Equivalence",
+        "operationId": "equivalence_api_equivalence_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EquivalenceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquivalenceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/regex-to-nfa": {
+      "post": {
+        "tags": [
+          "convert"
+        ],
+        "summary": "Regex To Nfa",
+        "operationId": "regex_to_nfa_api_regex_to_nfa_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegexRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConvertResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/remove-epsilon": {
+      "post": {
+        "tags": [
+          "convert"
+        ],
+        "summary": "Remove Epsilon Transitions",
+        "operationId": "remove_epsilon_transitions_api_remove_epsilon_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Automaton"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConvertResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nfa-to-dfa": {
+      "post": {
+        "tags": [
+          "convert"
+        ],
+        "summary": "To Dfa",
+        "operationId": "to_dfa_api_nfa_to_dfa_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Automaton"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConvertResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/minimize": {
+      "post": {
+        "tags": [
+          "convert"
+        ],
+        "summary": "Minimize Dfa",
+        "operationId": "minimize_dfa_api_minimize_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Automaton"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConvertResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Automaton": {
+        "properties": {
+          "schemaVersion": {
+            "type": "integer",
+            "const": 1,
+            "title": "Schemaversion",
+            "default": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "DFA",
+              "NFA",
+              "ENFA"
+            ],
+            "title": "Kind"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": ""
+          },
+          "alphabet": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 64,
+            "title": "Alphabet"
+          },
+          "states": {
+            "items": {
+              "$ref": "#/components/schemas/State"
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "title": "States"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start"
+          },
+          "accepting": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Accepting"
+          },
+          "transitions": {
+            "items": {
+              "$ref": "#/components/schemas/Transition"
+            },
+            "type": "array",
+            "maxItems": 20000,
+            "title": "Transitions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "alphabet",
+          "states",
+          "start",
+          "accepting",
+          "transitions"
+        ],
+        "title": "Automaton"
+      },
+      "BatchItem": {
+        "properties": {
+          "input": {
+            "type": "string",
+            "title": "Input"
+          },
+          "accepted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "input",
+          "accepted",
+          "error"
+        ],
+        "title": "BatchItem"
+      },
+      "BatchRequest": {
+        "properties": {
+          "automaton": {
+            "$ref": "#/components/schemas/Automaton"
+          },
+          "inputs": {
+            "items": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Inputs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "automaton",
+          "inputs"
+        ],
+        "title": "BatchRequest"
+      },
+      "BatchResponse": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/BatchItem"
+            },
+            "type": "array",
+            "title": "Results"
+          }
+        },
+        "type": "object",
+        "required": [
+          "results"
+        ],
+        "title": "BatchResponse"
+      },
+      "ConvertResponse": {
+        "properties": {
+          "automaton": {
+            "$ref": "#/components/schemas/Automaton"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/StepOut"
+            },
+            "type": "array",
+            "title": "Steps"
+          },
+          "stateMap": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statemap"
+          },
+          "rounds": {
+            "anyOf": [
+              {
+                "items": {
+                  "items": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rounds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "automaton",
+          "steps"
+        ],
+        "title": "ConvertResponse"
+      },
+      "EquivalenceRequest": {
+        "properties": {
+          "a": {
+            "$ref": "#/components/schemas/Automaton"
+          },
+          "b": {
+            "$ref": "#/components/schemas/Automaton"
+          }
+        },
+        "type": "object",
+        "required": [
+          "a",
+          "b"
+        ],
+        "title": "EquivalenceRequest"
+      },
+      "EquivalenceResponse": {
+        "properties": {
+          "equivalent": {
+            "type": "boolean",
+            "title": "Equivalent"
+          },
+          "counterexample": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Counterexample"
+          },
+          "aAccepts": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aaccepts"
+          },
+          "bAccepts": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baccepts"
+          },
+          "explored": {
+            "type": "integer",
+            "title": "Explored"
+          }
+        },
+        "type": "object",
+        "required": [
+          "equivalent",
+          "counterexample",
+          "aAccepts",
+          "bAccepts",
+          "explored"
+        ],
+        "title": "EquivalenceResponse"
+      },
+      "ErrorBody": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          },
+          "issues": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/IssueOut"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issues"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorBody"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorBody"
+          }
+        },
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "version"
+        ],
+        "title": "HealthResponse"
+      },
+      "IssueOut": {
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": [
+              "error",
+              "warning"
+            ],
+            "title": "Severity"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "stateIds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Stateids"
+          },
+          "transitionIndices": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Transitionindices"
+          }
+        },
+        "type": "object",
+        "required": [
+          "severity",
+          "code",
+          "message",
+          "stateIds",
+          "transitionIndices"
+        ],
+        "title": "IssueOut"
+      },
+      "Position": {
+        "properties": {
+          "x": {
+            "type": "number",
+            "title": "X"
+          },
+          "y": {
+            "type": "number",
+            "title": "Y"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "x",
+          "y"
+        ],
+        "title": "Position"
+      },
+      "RegexRequest": {
+        "properties": {
+          "regex": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Regex"
+          }
+        },
+        "type": "object",
+        "required": [
+          "regex"
+        ],
+        "title": "RegexRequest"
+      },
+      "SimStepOut": {
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "Index"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          },
+          "states": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "States"
+          },
+          "transitions": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Transitions"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position"
+          },
+          "symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Symbol"
+          }
+        },
+        "type": "object",
+        "required": [
+          "index",
+          "title",
+          "detail",
+          "states",
+          "transitions",
+          "position",
+          "symbol"
+        ],
+        "title": "SimStepOut"
+      },
+      "SimulateRequest": {
+        "properties": {
+          "automaton": {
+            "$ref": "#/components/schemas/Automaton"
+          },
+          "input": {
+            "type": "string",
+            "maxLength": 2000,
+            "title": "Input"
+          }
+        },
+        "type": "object",
+        "required": [
+          "automaton",
+          "input"
+        ],
+        "title": "SimulateRequest"
+      },
+      "SimulateResponse": {
+        "properties": {
+          "accepted": {
+            "type": "boolean",
+            "title": "Accepted"
+          },
+          "stuck": {
+            "type": "boolean",
+            "title": "Stuck"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/SimStepOut"
+            },
+            "type": "array",
+            "title": "Steps"
+          }
+        },
+        "type": "object",
+        "required": [
+          "accepted",
+          "stuck",
+          "steps"
+        ],
+        "title": "SimulateResponse"
+      },
+      "State": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Position"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "State"
+      },
+      "StepOut": {
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "Index"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          },
+          "states": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "States"
+          },
+          "transitions": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Transitions"
+          },
+          "addsStates": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Addsstates"
+          },
+          "addsTransitions": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Addstransitions"
+          },
+          "round": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Round"
+          }
+        },
+        "type": "object",
+        "required": [
+          "index",
+          "title",
+          "detail",
+          "states",
+          "transitions",
+          "addsStates",
+          "addsTransitions"
+        ],
+        "title": "StepOut"
+      },
+      "Transition": {
+        "properties": {
+          "from": {
+            "type": "string",
+            "title": "From"
+          },
+          "to": {
+            "type": "string",
+            "title": "To"
+          },
+          "symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Symbol",
+            "description": "Single character, or null for epsilon"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+          "symbol"
+        ],
+        "title": "Transition"
+      },
+      "ValidateResponse": {
+        "properties": {
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/IssueOut"
+            },
+            "type": "array",
+            "title": "Issues"
+          }
+        },
+        "type": "object",
+        "required": [
+          "issues"
+        ],
+        "title": "ValidateResponse"
+      }
+    }
+  }
+}

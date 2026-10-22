@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "kind": "DFA",
+  "name": "Even number of 1s",
+  "alphabet": [
+    "0",
+    "1"
+  ],
+  "states": [
+    {
+      "id": "e",
+      "label": "e"
+    },
+    {
+      "id": "o",
+      "label": "o"
+    }
+  ],
+  "start": "e",
+  "accepting": [
+    "e"
+  ],
+  "transitions": [
+    {
+      "from": "e",
+      "to": "e",
+      "symbol": "0"
+    },
+    {
+      "from": "e",
+      "to": "o",
+      "symbol": "1"
+    },
+    {
+      "from": "o",
+      "to": "o",
+      "symbol": "0"
+    },
+    {
+      "from": "o",
+      "to": "e",
+      "symbol": "1"
+    }
+  ]
+}
