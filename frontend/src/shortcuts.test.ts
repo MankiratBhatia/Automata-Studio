@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { emptyAutomaton } from './model/automaton'
+import { useMachineStore } from './machines/useMachineStore'
+import { useMode } from './mode'
 import { handleShortcut } from './shortcuts'
 import { useStudioStore } from './store/useStudioStore'
 
@@ -21,6 +23,7 @@ const el = (html: string): Element => {
 }
 
 beforeEach(() => {
+  useMode.setState({ mode: 'fa' })
   const blank = { id: 'blank', doc: emptyAutomaton() }
   useStudioStore.setState({
     tabs: [blank],
@@ -202,5 +205,107 @@ describe('while a dialog is open', () => {
     press('s')
     press('?')
     expect(store().doc.states).toHaveLength(0)
+  })
+})
+
+describe('on the pushdown and Turing machine screens', () => {
+  beforeEach(() => {
+    const none = {
+      input: '',
+      step: 0,
+      playing: false,
+      running: false,
+      error: null,
+      speed: 'normal' as const,
+      result: null,
+    }
+    useMachineStore.setState({ pdaRun: none, tmRun: none })
+  })
+
+  const withRun = (kind: 'pda' | 'tm') => {
+    const steps = [0, 1, 2].map((index) => ({
+      index,
+      state: 'q0',
+      position: index,
+      head: index,
+      stack: 'Z',
+      transition: null,
+      note: '',
+      read: null,
+      write: null,
+      cell: null,
+    }))
+    const base = {
+      input: 'ab',
+      step: 0,
+      playing: false,
+      running: false,
+      error: null,
+      speed: 'normal' as const,
+    }
+    if (kind === 'pda') {
+      useMachineStore.setState({
+        pdaRun: {
+          ...base,
+          result: { verdict: 'accepted', closest: false, explored: 3, reason: '', steps },
+        },
+      })
+    } else {
+      useMachineStore.setState({
+        tmRun: { ...base, result: { status: 'accepted', reason: '', output: '', steps } },
+      })
+    }
+  }
+
+  it('S does not add a state to the finite automaton hidden behind the screen', () => {
+    for (const mode of ['pda', 'tm'] as const) {
+      useMode.setState({ mode })
+      const e = press('s')
+      expect(store().doc.states).toHaveLength(0)
+      expect(e.defaultPrevented).toBe(false)
+    }
+  })
+
+  it('undo, redo and save are ignored too', () => {
+    store().addStateAt(at)
+    useMode.setState({ mode: 'pda' })
+    press('z', { ctrlKey: true })
+    expect(store().doc.states).toHaveLength(1)
+    const save = vi.fn().mockResolvedValue(undefined)
+    useStudioStore.setState({ saveProject: save })
+    press('s', { ctrlKey: true })
+    expect(save).not.toHaveBeenCalled()
+  })
+
+  it('? still opens the shortcut list', () => {
+    useMode.setState({ mode: 'tm' })
+    press('?')
+    expect(store().helpOpen).toBe(true)
+  })
+
+  it.each(['pda', 'tm'] as const)('Space steps a %s run', (kind) => {
+    useMode.setState({ mode: kind })
+    withRun(kind)
+    const e = press(' ')
+    const run =
+      kind === 'pda' ? useMachineStore.getState().pdaRun : useMachineStore.getState().tmRun
+    expect(run.step).toBe(1)
+    expect(e.defaultPrevented).toBe(true)
+  })
+
+  it('Space does nothing without a run, on a button, or in a text field', () => {
+    useMode.setState({ mode: 'pda' })
+    expect(press(' ').defaultPrevented).toBe(false)
+    withRun('pda')
+    press(' ', {}, el('<button>Run</button>'))
+    press(' ', {}, el('<input />'))
+    expect(useMachineStore.getState().pdaRun.step).toBe(0)
+  })
+
+  it('shortcuts return when you go back to finite automata', () => {
+    useMode.setState({ mode: 'pda' })
+    useMode.setState({ mode: 'fa' })
+    press('s')
+    expect(store().doc.states).toHaveLength(1)
   })
 })

@@ -15,6 +15,8 @@ Notation: an automaton is `A = (Q, Σ, δ, q₀, F)`. For an ε-NFA, `δ(q, a)` 
 | Subset construction | `convert.py` | NFA / ε-NFA → complete DFA |
 | Minimisation (Moore) | `minimize.py` | DFA → minimal complete DFA |
 | Equivalence | `equivalence.py` | two automata → yes, or a shortest counterexample |
+| Pushdown automaton | `pda.py` | PDA + string → accept / reject / undecided, with a computation |
+| Turing machine | `tm.py` | machine + string → accept / reject / step limit, with every step |
 
 ## 1. Building blocks
 
@@ -154,13 +156,72 @@ Do two automata accept the same language?
 
 Because breadth-first search discovers pairs in order of depth, the first witness is at the smallest depth, so **the counterexample is a shortest one**; trying symbols in alphabet order makes it the alphabetically first among the shortest. Cost: `O(|Σ| · |Q_A| · |Q_B|)` on the two DFAs.
 
-## 7. How correctness is tested
+## 7. Pushdown automata (PDA)
+
+A PDA is a finite automaton with a stack. One move says: *in state `q`, reading input symbol `a` (or nothing, ε), with `X` on top of the stack (or ignoring the stack), go to state `p` and replace `X` by the string `γ`.* In the app a move is written `a,X/γ`. The string `γ` is written **top first**: pushing `AB` leaves `A` on top with `B` beneath it. Any of `a`, `X`, `γ` may be empty.
+
+The machine accepts a string if *some* computation reads all of it and then meets the acceptance condition: **by final state** (the machine is in an accepting state) or **by empty stack** (the stack is empty, and the accepting states are ignored).
+
+### Simulation: breadth-first search over configurations
+
+A *configuration* is `(state, input consumed, stack)`. Because the machine is nondeterministic, one input has many possible computations, so the simulator explores them all:
+
+```
+start ← (q₀, 0, initial stack)
+visited ← {start} ; queue ← [start]
+while queue not empty:
+    (q, i, stack) ← pop front
+    for each move  q —a, X / γ→ p  that applies (a matches input[i], X is on top):
+        next ← (p, i + [a is not ε], γ + stack-without-X)
+        if next ∉ visited:
+            record how we got there; add to visited and queue
+            if next is accepting (input all read, and the condition holds): done
+```
+
+- **The accepting computation is a shortest one**, since breadth-first search reaches configurations in order of how many moves it took.
+- **Why breadth-first, not depth-first?** A depth-first search can follow an ε-move that keeps pushing forever and never come back to try the other choices. Breadth-first with a `visited` set terminates whenever the set of reachable configurations is finite, and finds an accepting one if it is within reach.
+- **Limits.** Some machines have infinitely many reachable configurations (an ε-loop that pushes on every pass), and others have an enormous number. The search stops at **200 stack symbols** (only that branch is abandoned; other branches carry on) and at **20,000 configurations** (the whole search stops). If nothing accepted and a limit cut the search short, the verdict is **undecided**, never "rejected": a search that did not finish has not shown that no computation accepts. A verdict of *rejected* means every computation was tried.
+- **Closest attempt.** When the machine does not accept, the trace shown is the computation that read the most input before getting stuck, which is usually what you want to see.
+
+Cost: on the order of `|Q| · (n + 1) · |Γ|^h` configurations for input length `n` and stack height `h` (it grows exponentially with the height), which is why the limits exist.
+
+**Examples** (all in the gallery, and all tested against a plain-Python definition of the language on *every* string up to length 8): aⁿbⁿ by final state, aⁿbⁿ by empty stack, even palindromes `w wᴿ` (the machine must *guess* where the middle is, which is exactly what nondeterminism buys), and balanced parentheses. On `aabb` the first machine makes 5 moves.
+
+## 8. Turing machines
+
+A deterministic single-tape machine. One move says: *in state `q`, reading symbol `a`: write `b`, move the head left (`L`), right (`R`) or not at all (`S`), and go to state `p`.* In the app a move is written `a/b,R`. The tape is unbounded in both directions and starts holding the input from cell 0, with blanks everywhere else.
+
+```
+state ← q₀ ; head ← 0 ; tape ← input (sparse: only non-blank cells are stored)
+repeat at most maxSteps times:
+    if state is accepting: ACCEPT        if state is rejecting: REJECT
+    a ← tape[head] (blank if unwritten)
+    if no move for (state, a): REJECT     (the machine is stuck)
+    write, move, change state as the move says
+STEP LIMIT if still running after maxSteps
+```
+
+- **Halting.** The machine stops by entering an accepting or rejecting state, or by having no move for what it reads (which rejects).
+- **The step limit (10,000 by default).** Whether an arbitrary machine ever halts is undecidable (the halting problem), so no simulator can always tell "slow" from "never". Instead of hanging, a run that is still going after the limit ends as **step limit**, which means "unknown", not "rejected". The gallery includes a machine that never halts to show this.
+- **Tape representation.** Cells are stored in a dictionary keyed by position, so the head can wander left of the input at no cost. Writing a blank removes the entry, which keeps the tape small.
+- **Replaying.** Each step records the cell it wrote, so the viewer rebuilds the tape at any moment by replaying the writes; the response stays small even for 10,000 steps.
+
+Cost: `O(1)` per step, so `O(steps)` in total.
+
+**Examples**, each tested against a plain-Python definition on every string up to a length (aⁿbⁿcⁿ up to length 7, palindromes up to length 10):
+
+- **Binary increment.** Scan right to the end of the number, then walk left turning each `1` into `0` until a `0` (or a blank) can become `1`. For `111` the carry runs off the left end and writes a new `1` in cell −1, giving `1000`. Checked against ordinary arithmetic for every number from 0 to 299.
+- **aⁿbⁿcⁿ**, a language no pushdown automaton can recognise. It crosses off one `a`, one `b` and one `c` per pass; `aabbcc` takes 23 steps.
+- **Palindromes**, by erasing the first symbol and comparing it with the last.
+
+## 9. How correctness is tested
 
 - **Brute-force comparison.** Property tests (Hypothesis) generate hundreds of random NFAs, ε-NFAs and regexes and check, on *every* string up to a fixed length, that each construction preserves the language: ε-removal, subset construction, minimisation, and the whole regex pipeline.
 - **An independent oracle.** Regex results are compared with Python's own `re` module; simulation is compared with a separate depth-first search that shares no code with the engine.
 - **Uniqueness.** Minimal DFAs reached by different routes must be identical up to renaming, and minimising twice changes nothing.
 - **Shortest counterexamples.** The equivalence checker is compared with brute force: it agrees on whether the languages are equal, the counterexample is a real one, and nothing shorter distinguishes them.
 - **Mutation checks.** Each construction was deliberately broken (a dropped ε-edge, a wrong accepting rule, depth-first instead of breadth-first search…) to confirm the tests fail.
+- **Machines against independent oracles.** Random Turing machines are run by the engine and by a separate simulator that uses a Python list for the tape; status, output and step count must agree. Random PDAs are compared with a depth-first search written differently from the breadth-first engine, and every PDA trace is checked move by move for legality. The named examples are compared with a plain-Python predicate on every string up to a length.
 - **Determinism.** The suite is run under many hash seeds, because engine output must not depend on set iteration order.
 
 Run the deep version with `HYPOTHESIS_PROFILE=thorough pytest tests/property` (500 examples per property instead of 100).

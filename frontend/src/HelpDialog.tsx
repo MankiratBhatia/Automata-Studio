@@ -2,12 +2,12 @@ import { Modal } from './components/Modal'
 import { useStudioStore } from './store/useStudioStore'
 
 const SHORTCUTS: [string, string][] = [
-  ['S', 'Add a state'],
+  ['S', 'Add a state (finite automata)'],
   ['Delete / Backspace', 'Delete the selected state or transition'],
   ['Ctrl+Z', 'Undo'],
   ['Ctrl+Y or Ctrl+Shift+Z', 'Redo'],
   ['Ctrl+S', 'Save the current tab as a project'],
-  ['Space', 'Next step (Simulate, Steps and Compare views)'],
+  ['Space', 'Next step (simulations, replays and machine runs)'],
   ['← →', 'Previous / next step while the step player has focus'],
   ['Double-click canvas', 'Add a state where you click'],
   ['Double-click a label', 'Edit a transition’s symbols'],

@@ -413,6 +413,210 @@
         }
       }
     },
+    "/api/pda/validate": {
+      "post": {
+        "tags": [
+          "machines"
+        ],
+        "summary": "Validate Pushdown",
+        "operationId": "validate_pushdown_api_pda_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Pda"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pda/run": {
+      "post": {
+        "tags": [
+          "machines"
+        ],
+        "summary": "Run Pushdown",
+        "operationId": "run_pushdown_api_pda_run_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdaRunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PdaRunResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tm/validate": {
+      "post": {
+        "tags": [
+          "machines"
+        ],
+        "summary": "Validate Turing",
+        "operationId": "validate_turing_api_tm_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Tm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tm/run": {
+      "post": {
+        "tags": [
+          "machines"
+        ],
+        "summary": "Run Turing",
+        "operationId": "run_turing_api_tm_run_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TmRunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TmRunResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/projects": {
       "get": {
         "tags": [
@@ -1060,6 +1264,255 @@
         ],
         "title": "IssueOut"
       },
+      "Pda": {
+        "properties": {
+          "schemaVersion": {
+            "type": "integer",
+            "const": 1,
+            "title": "Schemaversion",
+            "default": 1
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Name",
+            "default": ""
+          },
+          "inputAlphabet": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 64,
+            "title": "Inputalphabet"
+          },
+          "stackAlphabet": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 64,
+            "title": "Stackalphabet"
+          },
+          "startStack": {
+            "type": "string",
+            "maxLength": 1,
+            "title": "Startstack",
+            "description": "Initial stack symbol; empty for an empty stack"
+          },
+          "acceptBy": {
+            "type": "string",
+            "enum": [
+              "finalState",
+              "emptyStack"
+            ],
+            "title": "Acceptby"
+          },
+          "states": {
+            "items": {
+              "$ref": "#/components/schemas/State"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "States"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start"
+          },
+          "accepting": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Accepting"
+          },
+          "transitions": {
+            "items": {
+              "$ref": "#/components/schemas/PdaTransition"
+            },
+            "type": "array",
+            "maxItems": 2000,
+            "title": "Transitions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "inputAlphabet",
+          "stackAlphabet",
+          "startStack",
+          "acceptBy",
+          "states",
+          "start",
+          "accepting",
+          "transitions"
+        ],
+        "title": "Pda"
+      },
+      "PdaRunRequest": {
+        "properties": {
+          "pda": {
+            "$ref": "#/components/schemas/Pda"
+          },
+          "input": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Input"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pda",
+          "input"
+        ],
+        "title": "PdaRunRequest"
+      },
+      "PdaRunResponse": {
+        "properties": {
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "rejected",
+              "limit"
+            ],
+            "title": "Verdict"
+          },
+          "closest": {
+            "type": "boolean",
+            "title": "Closest"
+          },
+          "explored": {
+            "type": "integer",
+            "title": "Explored"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/PdaStepOut"
+            },
+            "type": "array",
+            "title": "Steps"
+          }
+        },
+        "type": "object",
+        "required": [
+          "verdict",
+          "closest",
+          "explored",
+          "reason",
+          "steps"
+        ],
+        "title": "PdaRunResponse"
+      },
+      "PdaStepOut": {
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "Index"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position"
+          },
+          "stack": {
+            "type": "string",
+            "title": "Stack"
+          },
+          "transition": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transition"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "index",
+          "state",
+          "position",
+          "stack",
+          "transition",
+          "note"
+        ],
+        "title": "PdaStepOut"
+      },
+      "PdaTransition": {
+        "properties": {
+          "from": {
+            "type": "string",
+            "title": "From"
+          },
+          "to": {
+            "type": "string",
+            "title": "To"
+          },
+          "input": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input",
+            "description": "One input symbol, or null to read nothing (epsilon)"
+          },
+          "pop": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pop",
+            "description": "One stack symbol to pop, or null to pop nothing"
+          },
+          "push": {
+            "type": "string",
+            "maxLength": 20,
+            "title": "Push",
+            "description": "Symbols to push, top first; empty pushes nothing"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+          "input",
+          "pop",
+          "push"
+        ],
+        "title": "PdaTransition"
+      },
       "Position": {
         "properties": {
           "x": {
@@ -1380,6 +1833,278 @@
           "addsTransitions"
         ],
         "title": "StepOut"
+      },
+      "Tm": {
+        "properties": {
+          "schemaVersion": {
+            "type": "integer",
+            "const": 1,
+            "title": "Schemaversion",
+            "default": 1
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Name",
+            "default": ""
+          },
+          "inputAlphabet": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 64,
+            "title": "Inputalphabet"
+          },
+          "tapeAlphabet": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 64,
+            "title": "Tapealphabet"
+          },
+          "blank": {
+            "type": "string",
+            "maxLength": 1,
+            "minLength": 1,
+            "title": "Blank"
+          },
+          "states": {
+            "items": {
+              "$ref": "#/components/schemas/State"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "States"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start"
+          },
+          "accepting": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Accepting"
+          },
+          "rejecting": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Rejecting"
+          },
+          "transitions": {
+            "items": {
+              "$ref": "#/components/schemas/TmTransition"
+            },
+            "type": "array",
+            "maxItems": 2000,
+            "title": "Transitions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "inputAlphabet",
+          "tapeAlphabet",
+          "blank",
+          "states",
+          "start",
+          "accepting",
+          "rejecting",
+          "transitions"
+        ],
+        "title": "Tm"
+      },
+      "TmRunRequest": {
+        "properties": {
+          "tm": {
+            "$ref": "#/components/schemas/Tm"
+          },
+          "input": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Input"
+          },
+          "maxSteps": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 1.0,
+            "title": "Maxsteps",
+            "default": 10000
+          }
+        },
+        "type": "object",
+        "required": [
+          "tm",
+          "input"
+        ],
+        "title": "TmRunRequest"
+      },
+      "TmRunResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "rejected",
+              "limit"
+            ],
+            "title": "Status"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "output": {
+            "type": "string",
+            "title": "Output"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/TmStepOut"
+            },
+            "type": "array",
+            "title": "Steps"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "reason",
+          "output",
+          "steps"
+        ],
+        "title": "TmRunResponse"
+      },
+      "TmStepOut": {
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "Index"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "head": {
+            "type": "integer",
+            "title": "Head"
+          },
+          "transition": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transition"
+          },
+          "read": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read"
+          },
+          "write": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Write"
+          },
+          "cell": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cell"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "index",
+          "state",
+          "head",
+          "transition",
+          "read",
+          "write",
+          "cell",
+          "note"
+        ],
+        "title": "TmStepOut"
+      },
+      "TmTransition": {
+        "properties": {
+          "from": {
+            "type": "string",
+            "title": "From"
+          },
+          "to": {
+            "type": "string",
+            "title": "To"
+          },
+          "read": {
+            "type": "string",
+            "maxLength": 1,
+            "minLength": 1,
+            "title": "Read"
+          },
+          "write": {
+            "type": "string",
+            "maxLength": 1,
+            "minLength": 1,
+            "title": "Write"
+          },
+          "move": {
+            "type": "string",
+            "enum": [
+              "L",
+              "R",
+              "S"
+            ],
+            "title": "Move"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+          "read",
+          "write",
+          "move"
+        ],
+        "title": "TmTransition"
       },
       "Transition": {
         "properties": {

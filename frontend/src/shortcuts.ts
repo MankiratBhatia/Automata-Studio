@@ -1,4 +1,6 @@
 import { useEffect } from 'react'
+import { useMachineStore } from './machines/useMachineStore'
+import { useMode } from './mode'
 import { nextFreePosition } from './model/automaton'
 import { useStudioStore } from './store/useStudioStore'
 
@@ -11,6 +13,8 @@ const ACTIVATABLE = 'button, a[href], summary, [role="tab"], [role="menuitem"]'
  * Exported separately from the hook so it can be tested without rendering the app.
  */
 export function handleShortcut(e: KeyboardEvent): boolean {
+  const mode = useMode.getState().mode
+  if (mode !== 'fa') return handleMachineShortcut(e, mode)
   const st = useStudioStore.getState()
   const target = e.target instanceof Element ? e.target : null
   const key = e.key.toLowerCase()
@@ -72,6 +76,34 @@ export function handleShortcut(e: KeyboardEvent): boolean {
 
   if (e.key === 'Escape' && st.selection) {
     st.select(null)
+    return true
+  }
+  return false
+}
+
+/**
+ * On the pushdown and Turing machine screens only two shortcuts apply: `?` for help and Space
+ * to step a run. Everything else (adding states, undo, save...) belongs to finite automata, and
+ * must never touch the automaton hidden behind the other screen.
+ */
+function handleMachineShortcut(e: KeyboardEvent, mode: 'pda' | 'tm'): boolean {
+  const target = e.target instanceof Element ? e.target : null
+  const fa = useStudioStore.getState()
+  if (fa.prompt || fa.projects.open || fa.helpOpen) return false
+  if (target?.closest(TEXT_FIELD)) return false
+  if (e.ctrlKey || e.metaKey || e.altKey) return false
+
+  if (e.key === '?') {
+    e.preventDefault()
+    fa.setHelpOpen(true)
+    return true
+  }
+  if (e.key === ' ' && !target?.closest(ACTIVATABLE)) {
+    const st = useMachineStore.getState()
+    const run = mode === 'pda' ? st.pdaRun : st.tmRun
+    if (!run.result) return false
+    st.gotoStep(mode, run.step + 1)
+    e.preventDefault()
     return true
   }
   return false

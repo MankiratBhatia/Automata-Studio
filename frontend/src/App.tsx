@@ -17,12 +17,18 @@ import { PropertiesPanel } from './panels/PropertiesPanel'
 import { SimulationPanel } from './panels/SimulationPanel'
 import { ValidationPanel } from './panels/ValidationPanel'
 import { useAutoValidate, useAutosave } from './store/effects'
+import { useMachineAutosave } from './machines/effects'
+import { PdaApp } from './machines/PdaApp'
+import { TmApp } from './machines/TmApp'
+import { useMode } from './mode'
 import { useStudioStore, type SideTab } from './store/useStudioStore'
 
 export default function App() {
   useAutoValidate()
   useAutosave()
   useShortcuts()
+  useMachineAutosave()
+  const mode = useMode((s) => s.mode)
   const tab = useStudioStore((s) => s.sideTab)
   const setTab = useStudioStore.getState().setSideTab
   const replaying = useStudioStore((s) => tab === 'steps' && !!s.records[s.activeTabId])
@@ -53,57 +59,61 @@ export default function App() {
     <div className="flex h-screen flex-col bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
       <ArrowDefs />
       <Header />
-      <div className="flex min-h-0 flex-1">
-        <main className="flex min-w-0 flex-1 flex-col" aria-label="Automaton canvas">
-          <TabBar />
-          <TipBar />
-          <div className="min-h-0 flex-1">
-            {comparing ? <ComparePane /> : replaying ? <ReplayView /> : <AutomatonCanvas />}
-          </div>
-        </main>
-        <aside
-          className="flex w-[24rem] shrink-0 flex-col border-l border-slate-200 dark:border-slate-700"
-          aria-label="Side panel"
-        >
-          <div role="tablist" className="flex border-b border-slate-200 dark:border-slate-700">
-            {tabs.map((t) => (
-              <button
-                key={t.id}
-                role="tab"
-                id={`tab-${t.id}`}
-                aria-selected={tab === t.id}
-                aria-controls={`panel-${t.id}`}
-                onClick={() => setTab(t.id)}
-                className={`flex-1 border-b-2 px-1.5 py-2 text-sm font-medium ${
-                  tab === t.id
-                    ? 'border-blue-600 text-blue-700 dark:text-blue-300'
-                    : 'border-transparent text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100'
-                }`}
-              >
-                {t.label}
-                {t.badge && (
-                  <span className={`ml-1.5 rounded-full px-1.5 text-xs ${t.badgeTone}`}>
-                    {t.badge}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-          <div
-            role="tabpanel"
-            id={`panel-${tab}`}
-            aria-labelledby={`tab-${tab}`}
-            className="min-h-0 flex-1 overflow-y-auto"
+      {mode === 'pda' && <PdaApp />}
+      {mode === 'tm' && <TmApp />}
+      {mode === 'fa' && (
+        <div className="flex min-h-0 flex-1">
+          <main className="flex min-w-0 flex-1 flex-col" aria-label="Automaton canvas">
+            <TabBar />
+            <TipBar />
+            <div className="min-h-0 flex-1">
+              {comparing ? <ComparePane /> : replaying ? <ReplayView /> : <AutomatonCanvas />}
+            </div>
+          </main>
+          <aside
+            className="flex w-[24rem] shrink-0 flex-col border-l border-slate-200 dark:border-slate-700"
+            aria-label="Side panel"
           >
-            {tab === 'edit' && <PropertiesPanel />}
-            {tab === 'validate' && <ValidationPanel />}
-            {tab === 'simulate' && <SimulationPanel />}
-            {tab === 'convert' && <ConvertPanel />}
-            {tab === 'steps' && <StepsPanel />}
-            {tab === 'compare' && <ComparePanel />}
-          </div>
-        </aside>
-      </div>
+            <div role="tablist" className="flex border-b border-slate-200 dark:border-slate-700">
+              {tabs.map((t) => (
+                <button
+                  key={t.id}
+                  role="tab"
+                  id={`tab-${t.id}`}
+                  aria-selected={tab === t.id}
+                  aria-controls={`panel-${t.id}`}
+                  onClick={() => setTab(t.id)}
+                  className={`flex-1 border-b-2 px-1.5 py-2 text-sm font-medium ${
+                    tab === t.id
+                      ? 'border-blue-600 text-blue-700 dark:text-blue-300'
+                      : 'border-transparent text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100'
+                  }`}
+                >
+                  {t.label}
+                  {t.badge && (
+                    <span className={`ml-1.5 rounded-full px-1.5 text-xs ${t.badgeTone}`}>
+                      {t.badge}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+            <div
+              role="tabpanel"
+              id={`panel-${tab}`}
+              aria-labelledby={`tab-${tab}`}
+              className="min-h-0 flex-1 overflow-y-auto"
+            >
+              {tab === 'edit' && <PropertiesPanel />}
+              {tab === 'validate' && <ValidationPanel />}
+              {tab === 'simulate' && <SimulationPanel />}
+              {tab === 'convert' && <ConvertPanel />}
+              {tab === 'steps' && <StepsPanel />}
+              {tab === 'compare' && <ComparePanel />}
+            </div>
+          </aside>
+        </div>
+      )}
       <SymbolPrompt />
       <ProjectsDialog />
       <HelpDialog />

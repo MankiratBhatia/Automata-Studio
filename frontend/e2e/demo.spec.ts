@@ -140,6 +140,34 @@ test('the whole demo script runs cleanly, in well under five minutes', async ({ 
   await expect(page.locator('html')).toHaveClass(/dark/)
   await page.keyboard.press('?')
   await expect(page.getByRole('dialog', { name: 'Keyboard shortcuts' })).toBeVisible()
+  await page.keyboard.press('Escape')
+
+  // Bonus: beyond finite automata
+  const kind = (name: string) =>
+    page.getByRole('navigation', { name: 'Kind of machine' }).getByRole('button', { name }).click()
+  await kind('Pushdown automata')
+  await page.getByRole('tab', { name: 'Run', exact: true }).click()
+  await page.getByLabel('Input string').fill('aaabbb')
+  await page.getByRole('button', { name: 'Run', exact: true }).click()
+  await expect(page.getByTestId('verdict')).toHaveText('Accepted')
+  await page.getByRole('button', { name: 'Next step' }).click()
+  await page.getByRole('button', { name: 'Next step' }).click()
+  await expect(page.getByTestId('stack').locator('li')).toHaveCount(3) // A A Z after two a's
+  await page.getByLabel('Input string').fill('aab')
+  await page.getByRole('button', { name: 'Run', exact: true }).click()
+  await expect(page.getByTestId('verdict')).toHaveText('Rejected')
+  await kind('Turing machines')
+  await page.getByRole('tab', { name: 'Run', exact: true }).click()
+  await page.getByLabel('Input string').fill('1011')
+  await page.getByRole('button', { name: 'Run', exact: true }).click()
+  await expect(page.getByTestId('output')).toHaveText('1100')
+  await expect(page.getByTestId('tape')).toBeVisible()
+  await page
+    .getByRole('combobox', { name: 'Load example' })
+    .selectOption({ label: 'Runs forever (step limit demo)' })
+  await page.getByLabel('Input string').fill('a')
+  await page.getByRole('button', { name: 'Run', exact: true }).click()
+  await expect(page.getByTestId('verdict')).toHaveText('Step limit')
 
   expect(Date.now() - started, 'the demo should take far less than 5 minutes').toBeLessThan(
     5 * 60_000,

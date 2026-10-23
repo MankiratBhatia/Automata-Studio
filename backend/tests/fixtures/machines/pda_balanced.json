@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "name": "Balanced parentheses",
+  "inputAlphabet": [
+    "(",
+    ")"
+  ],
+  "stackAlphabet": [
+    "Z",
+    "X"
+  ],
+  "startStack": "Z",
+  "acceptBy": "finalState",
+  "states": [
+    {
+      "id": "q0",
+      "label": "q0"
+    },
+    {
+      "id": "q1",
+      "label": "q1"
+    }
+  ],
+  "start": "q0",
+  "accepting": [
+    "q1"
+  ],
+  "transitions": [
+    {
+      "from": "q0",
+      "to": "q0",
+      "input": "(",
+      "pop": "Z",
+      "push": "XZ"
+    },
+    {
+      "from": "q0",
+      "to": "q0",
+      "input": "(",
+      "pop": "X",
+      "push": "XX"
+    },
+    {
+      "from": "q0",
+      "to": "q0",
+      "input": ")",
+      "pop": "X",
+      "push": ""
+    },
+    {
+      "from": "q0",
+      "to": "q1",
+      "input": null,
+      "pop": "Z",
+      "push": "Z"
+    }
+  ]
+}

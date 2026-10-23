@@ -1,10 +1,11 @@
 # Automata Studio
 
 Interactive web app to build, simulate, analyse and convert DFA / NFA / ε-NFA.
-See [docs/PLAN.md](docs/PLAN.md) for the full roadmap. Current status: **Phase 5 (persistence and polish)**. Draw, validate and simulate DFA/NFA/ε-NFA;
+See [docs/PLAN.md](docs/PLAN.md) for the full roadmap. Current status: **Phase 6 (pushdown automata and Turing machines)**, on top of the finished finite-automata studio. Draw, validate and simulate DFA/NFA/ε-NFA;
 convert (regex → ε-NFA → DFA → minimal DFA); replay each algorithm step by step; check two automata
 for equivalence with a shortest counterexample; save projects, undo/redo, export images and tables,
-and use it in light or dark mode.
+and use it in light or dark mode. A header switch also opens a **pushdown automaton** simulator (with a
+stack view) and a **Turing machine** simulator (with a tape view).
 
 More documentation: [`docs/ALGORITHMS.md`](docs/ALGORITHMS.md) (how each algorithm works, its cost and
 how it is tested), [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) (a 5-minute walkthrough, also run as
@@ -62,6 +63,12 @@ cd frontend && npx playwright install chromium && npm run e2e   # starts both se
 - **Export ▾**: the automaton as JSON, the drawing as PNG or SVG, or the transition table as
   Markdown or CSV. Press **?** for all keyboard shortcuts.
 - **Theme**: System, Light or Dark.
+- **Pushdown automata** and **Turing machines** (the switch at the top left): each has an editor
+  (states, alphabets, a transition table), a live state diagram, examples, import/export as JSON, and a
+  *Run* tab that replays a computation step by step: the stack for a PDA, the tape and head for a Turing
+  machine. A PDA is searched nondeterministically and reports **Undecided** (not "Rejected") if a limit
+  stopped the search; a Turing machine stops after 10,000 steps with **Step limit**. These screens save
+  to the browser and by file; they are not part of *Projects*.
 - Work autosaves in the browser. *Export* / *Import* use the JSON format in `docs/PLAN.md`.
 
 ## API types

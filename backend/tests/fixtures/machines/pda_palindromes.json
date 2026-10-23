@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "name": "Even palindromes w w^R (nondeterministic)",
+  "inputAlphabet": [
+    "a",
+    "b"
+  ],
+  "stackAlphabet": [
+    "Z",
+    "A",
+    "B"
+  ],
+  "startStack": "Z",
+  "acceptBy": "finalState",
+  "states": [
+    {
+      "id": "q0",
+      "label": "q0"
+    },
+    {
+      "id": "q1",
+      "label": "q1"
+    },
+    {
+      "id": "q2",
+      "label": "q2"
+    }
+  ],
+  "start": "q0",
+  "accepting": [
+    "q2"
+  ],
+  "transitions": [
+    {
+      "from": "q0",
+      "to": "q0",
+      "input": "a",
+      "pop": "Z",
+      "push": "AZ"
+    },
+    {
+      "from": "q0",
+      "to": "q0",
+      "input": "a",
+      "pop": "A",
+      "push": "AA"
+    },
+    {
+      "from": "q0",
+      "to": "q0",
+      "input": "a",
+      "pop": "B",
+      "push": "AB"
+    },
+    {
+      "from": "q0",
+      "to": "q0",
+      "input": "b",
+      "pop": "Z",
+      "push": "BZ"
+    },
+    {
+      "from": "q0",
+      "to": "q0",
+      "input": "b",
+      "pop": "A",
+      "push": "BA"
+    },
+    {
+      "from": "q0",
+      "to": "q0",
+      "input": "b",
+      "pop": "B",
+      "push": "BB"
+    },
+    {
+      "from": "q0",
+      "to": "q1",
+      "input": null,
+      "pop": "Z",
+      "push": "Z"
+    },
+    {
+      "from": "q0",
+      "to": "q1",
+      "input": null,
+      "pop": "A",
+      "push": "A"
+    },
+    {
+      "from": "q0",
+      "to": "q1",
+      "input": null,
+      "pop": "B",
+      "push": "B"
+    },
+    {
+      "from": "q1",
+      "to": "q1",
+      "input": "a",
+      "pop": "A",
+      "push": ""
+    },
+    {
+      "from": "q1",
+      "to": "q1",
+      "input": "b",
+      "pop": "B",
+      "push": ""
+    },
+    {
+      "from": "q1",
+      "to": "q2",
+      "input": null,
+      "pop": "Z",
+      "push": "Z"
+    }
+  ]
+}

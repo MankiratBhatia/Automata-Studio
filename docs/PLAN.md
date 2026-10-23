@@ -434,6 +434,13 @@ Notes on what differs from the plan above:
 - **Schema impact:** add `"kind": "PDA" | "TM"` and kind-specific transition fields. The
   `schemaVersion` field exists so you can migrate old files.
 
+**Status: PDA and Turing machine simulators done.** What was built and what differs from the bullets above:
+- Machines are **separate document types** (`Pda`, `Tm`) with their own engines (`automata_core/pda.py`, `tm.py`), validation and API (`/api/pda/*`, `/api/tm/*`), rather than new `kind` values of the finite-automaton schema. The finite-automaton code is untouched. They share the diagram renderer, playback controls and example-fixture mechanism.
+- PDA: breadth-first search over configurations, acceptance by final state or empty stack, limits of 200 stack symbols (per branch) and 20,000 configurations, and an **Undecided** verdict when a limit cut the search short. The trace shown is the shortest accepting computation, or the closest attempt.
+- Turing machine: deterministic single tape, sparse and unbounded both ways, `L`/`R`/`S` moves, accepting and rejecting states, step cap of 10,000, and a tape viewer with the head marked.
+- Examples: four PDAs (aⁿbⁿ both ways, even palindromes, balanced parentheses) and four Turing machines (binary increment, aⁿbⁿcⁿ, palindromes, one that never halts).
+- Not done (listed above as "Others"): DFA → regex, product constructions, CFG → PDA. Also not done: nondeterministic or multi-tape Turing machines, and saving machines to the database (they save in the browser and as JSON files).
+
 ---
 
 ## 6. Testing strategy

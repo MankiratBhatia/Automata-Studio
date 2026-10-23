@@ -4,8 +4,12 @@ import type {
   BatchResponse,
   ConvertResponse,
   EquivalenceResponse,
+  Pda,
+  PdaRunResponse,
   Project,
   ProjectSummary,
+  Tm,
+  TmRunResponse,
   Issue,
   SimulateResponse,
   ValidateResponse,
@@ -105,3 +109,13 @@ export const updateProject = (id: string, automaton: Automaton): Promise<Project
 
 export const deleteProject = (id: string): Promise<void> =>
   request(`/api/projects/${id}`, { method: 'DELETE' })
+
+export const validatePda = (pda: Pda): Promise<ValidateResponse> => post('/api/pda/validate', pda)
+
+export const runPda = (pda: Pda, input: string): Promise<PdaRunResponse> =>
+  post('/api/pda/run', { pda, input })
+
+export const validateTm = (tm: Tm): Promise<ValidateResponse> => post('/api/tm/validate', tm)
+
+export const runTm = (tm: Tm, input: string, maxSteps?: number): Promise<TmRunResponse> =>
+  post('/api/tm/run', { tm, input, ...(maxSteps === undefined ? {} : { maxSteps }) })

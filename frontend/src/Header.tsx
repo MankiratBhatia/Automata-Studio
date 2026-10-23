@@ -2,6 +2,9 @@ import { useRef } from 'react'
 import { useBackendStatus } from './api/useBackendStatus'
 import { EXAMPLES } from './examples'
 import { ExportMenu } from './ExportMenu'
+import { MachineToolbar } from './machines/MachineToolbar'
+import { useMode } from './mode'
+import { ModeSwitch } from './ModeSwitch'
 import { ParseError, parseAutomaton } from './model/serialize'
 import { useStudioStore } from './store/useStudioStore'
 import { useTheme, type ThemePref } from './theme'
@@ -15,6 +18,7 @@ const DOT: Record<string, string> = {
 export function Header() {
   const status = useBackendStatus()
   const fileInput = useRef<HTMLInputElement>(null)
+  const mode = useMode((s) => s.mode)
   const pref = useTheme((s) => s.pref)
   const setPref = useTheme((s) => s.setPref)
 
@@ -36,64 +40,72 @@ export function Header() {
     <header className="border-b border-slate-200 dark:border-slate-700">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2">
         <h1 className="text-lg font-semibold">Automata Studio</h1>
+        <ModeSwitch />
 
-        <div className="flex flex-wrap items-center gap-2">
-          <select
-            aria-label="Load example"
-            value=""
-            onChange={(e) => {
-              const ex = EXAMPLES.find((x) => x.id === e.target.value)
-              if (ex) useStudioStore.getState().openInNewTab(ex.automaton)
-            }}
-            className="btn w-44 dark:bg-slate-900"
-          >
-            <option value="">Examples…</option>
-            {EXAMPLES.map((ex) => (
-              <option key={ex.id} value={ex.id}>
-                {ex.title}
-              </option>
-            ))}
-          </select>
-          <button type="button" className="btn" onClick={() => useStudioStore.getState().newTab()}>
-            New
-          </button>
-          <button type="button" className="btn" onClick={() => fileInput.current?.click()}>
-            Import
-          </button>
-          <ExportMenu />
-          <span
-            className="mx-1 hidden h-5 w-px bg-slate-300 sm:inline-block dark:bg-slate-600"
-            aria-hidden
-          />
-          <button
-            type="button"
-            className="btn"
-            onClick={() => useStudioStore.getState().openProjects()}
-          >
-            Projects
-          </button>
-          <button
-            type="button"
-            className="btn"
-            aria-keyshortcuts="Control+S Meta+S"
-            title="Save this tab as a project (Ctrl+S)"
-            onClick={() => void useStudioStore.getState().saveProject()}
-          >
-            Save
-          </button>
-          <input
-            ref={fileInput}
-            type="file"
-            accept="application/json,.json"
-            aria-label="Import automaton file"
-            hidden
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              e.target.value = '' // allow re-importing the same file
-              if (file) void onImport(file)
-            }}
-          />
-        </div>
+        {mode !== 'fa' && <MachineToolbar kind={mode} />}
+        {mode === 'fa' && (
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              aria-label="Load example"
+              value=""
+              onChange={(e) => {
+                const ex = EXAMPLES.find((x) => x.id === e.target.value)
+                if (ex) useStudioStore.getState().openInNewTab(ex.automaton)
+              }}
+              className="btn w-44 dark:bg-slate-900"
+            >
+              <option value="">Examples…</option>
+              {EXAMPLES.map((ex) => (
+                <option key={ex.id} value={ex.id}>
+                  {ex.title}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => useStudioStore.getState().newTab()}
+            >
+              New
+            </button>
+            <button type="button" className="btn" onClick={() => fileInput.current?.click()}>
+              Import
+            </button>
+            <ExportMenu />
+            <span
+              className="mx-1 hidden h-5 w-px bg-slate-300 sm:inline-block dark:bg-slate-600"
+              aria-hidden
+            />
+            <button
+              type="button"
+              className="btn"
+              onClick={() => useStudioStore.getState().openProjects()}
+            >
+              Projects
+            </button>
+            <button
+              type="button"
+              className="btn"
+              aria-keyshortcuts="Control+S Meta+S"
+              title="Save this tab as a project (Ctrl+S)"
+              onClick={() => void useStudioStore.getState().saveProject()}
+            >
+              Save
+            </button>
+            <input
+              ref={fileInput}
+              type="file"
+              accept="application/json,.json"
+              aria-label="Import automaton file"
+              hidden
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                e.target.value = '' // allow re-importing the same file
+                if (file) void onImport(file)
+              }}
+            />
+          </div>
+        )}
 
         <div className="ml-auto flex items-center gap-3 text-sm">
           <select

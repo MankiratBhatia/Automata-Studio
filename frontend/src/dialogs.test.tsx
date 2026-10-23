@@ -113,7 +113,7 @@ describe('HelpDialog', () => {
     render(<HelpDialog />)
     const dialog = screen.getByRole('dialog', { name: 'Keyboard shortcuts' })
     expect(within(dialog).getByText('Ctrl+Z')).toBeInTheDocument()
-    expect(within(dialog).getByText('Add a state')).toBeInTheDocument()
+    expect(within(dialog).getByText('Add a state (finite automata)')).toBeInTheDocument()
     await userEvent.click(within(dialog).getByRole('button', { name: 'Close' }))
     expect(useStudioStore.getState().helpOpen).toBe(false)
   })

@@ -140,6 +140,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/pda/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Validate Pushdown */
+        post: operations["validate_pushdown_api_pda_validate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/pda/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Run Pushdown */
+        post: operations["run_pushdown_api_pda_run_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tm/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Validate Turing */
+        post: operations["validate_turing_api_tm_validate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tm/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Run Turing */
+        post: operations["run_turing_api_tm_run_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/projects": {
         parameters: {
             query?: never;
@@ -318,6 +386,101 @@ export interface components {
             /** Transitionindices */
             transitionIndices: number[];
         };
+        /** Pda */
+        Pda: {
+            /**
+             * Schemaversion
+             * @default 1
+             * @constant
+             */
+            schemaVersion: 1;
+            /**
+             * Name
+             * @default
+             */
+            name: string;
+            /** Inputalphabet */
+            inputAlphabet: string[];
+            /** Stackalphabet */
+            stackAlphabet: string[];
+            /**
+             * Startstack
+             * @description Initial stack symbol; empty for an empty stack
+             */
+            startStack: string;
+            /**
+             * Acceptby
+             * @enum {string}
+             */
+            acceptBy: "finalState" | "emptyStack";
+            /** States */
+            states: components["schemas"]["State"][];
+            /** Start */
+            start: string | null;
+            /** Accepting */
+            accepting: string[];
+            /** Transitions */
+            transitions: components["schemas"]["PdaTransition"][];
+        };
+        /** PdaRunRequest */
+        PdaRunRequest: {
+            pda: components["schemas"]["Pda"];
+            /** Input */
+            input: string;
+        };
+        /** PdaRunResponse */
+        PdaRunResponse: {
+            /**
+             * Verdict
+             * @enum {string}
+             */
+            verdict: "accepted" | "rejected" | "limit";
+            /** Closest */
+            closest: boolean;
+            /** Explored */
+            explored: number;
+            /** Reason */
+            reason: string;
+            /** Steps */
+            steps: components["schemas"]["PdaStepOut"][];
+        };
+        /** PdaStepOut */
+        PdaStepOut: {
+            /** Index */
+            index: number;
+            /** State */
+            state: string;
+            /** Position */
+            position: number;
+            /** Stack */
+            stack: string;
+            /** Transition */
+            transition: number | null;
+            /** Note */
+            note: string;
+        };
+        /** PdaTransition */
+        PdaTransition: {
+            /** From */
+            from: string;
+            /** To */
+            to: string;
+            /**
+             * Input
+             * @description One input symbol, or null to read nothing (epsilon)
+             */
+            input: string | null;
+            /**
+             * Pop
+             * @description One stack symbol to pop, or null to pop nothing
+             */
+            pop: string | null;
+            /**
+             * Push
+             * @description Symbols to push, top first; empty pushes nothing
+             */
+            push: string;
+        };
         /** Position */
         Position: {
             /** X */
@@ -425,6 +588,96 @@ export interface components {
             addsTransitions: number[];
             /** Round */
             round?: number | null;
+        };
+        /** Tm */
+        Tm: {
+            /**
+             * Schemaversion
+             * @default 1
+             * @constant
+             */
+            schemaVersion: 1;
+            /**
+             * Name
+             * @default
+             */
+            name: string;
+            /** Inputalphabet */
+            inputAlphabet: string[];
+            /** Tapealphabet */
+            tapeAlphabet: string[];
+            /** Blank */
+            blank: string;
+            /** States */
+            states: components["schemas"]["State"][];
+            /** Start */
+            start: string | null;
+            /** Accepting */
+            accepting: string[];
+            /** Rejecting */
+            rejecting: string[];
+            /** Transitions */
+            transitions: components["schemas"]["TmTransition"][];
+        };
+        /** TmRunRequest */
+        TmRunRequest: {
+            tm: components["schemas"]["Tm"];
+            /** Input */
+            input: string;
+            /**
+             * Maxsteps
+             * @default 10000
+             */
+            maxSteps: number;
+        };
+        /** TmRunResponse */
+        TmRunResponse: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "accepted" | "rejected" | "limit";
+            /** Reason */
+            reason: string;
+            /** Output */
+            output: string;
+            /** Steps */
+            steps: components["schemas"]["TmStepOut"][];
+        };
+        /** TmStepOut */
+        TmStepOut: {
+            /** Index */
+            index: number;
+            /** State */
+            state: string;
+            /** Head */
+            head: number;
+            /** Transition */
+            transition: number | null;
+            /** Read */
+            read: string | null;
+            /** Write */
+            write: string | null;
+            /** Cell */
+            cell: number | null;
+            /** Note */
+            note: string;
+        };
+        /** TmTransition */
+        TmTransition: {
+            /** From */
+            from: string;
+            /** To */
+            to: string;
+            /** Read */
+            read: string;
+            /** Write */
+            write: string;
+            /**
+             * Move
+             * @enum {string}
+             */
+            move: "L" | "R" | "S";
         };
         /** Transition */
         Transition: {
@@ -766,6 +1019,174 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ConvertResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    validate_pushdown_api_pda_validate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Pda"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidateResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    run_pushdown_api_pda_run_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PdaRunRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PdaRunResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    validate_turing_api_tm_validate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Tm"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidateResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    run_turing_api_tm_run_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TmRunRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TmRunResponse"];
                 };
             };
             /** @description Bad Request */

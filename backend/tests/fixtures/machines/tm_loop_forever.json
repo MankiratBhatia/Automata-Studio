@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "name": "Runs forever (step limit demo)",
+  "inputAlphabet": [
+    "a"
+  ],
+  "tapeAlphabet": [
+    "a",
+    "_"
+  ],
+  "blank": "_",
+  "states": [
+    {
+      "id": "q0",
+      "label": "q0"
+    }
+  ],
+  "start": "q0",
+  "accepting": [],
+  "rejecting": [],
+  "transitions": [
+    {
+      "from": "q0",
+      "to": "q0",
+      "read": "a",
+      "write": "a",
+      "move": "R"
+    },
+    {
+      "from": "q0",
+      "to": "q0",
+      "read": "_",
+      "write": "_",
+      "move": "R"
+    }
+  ]
+}

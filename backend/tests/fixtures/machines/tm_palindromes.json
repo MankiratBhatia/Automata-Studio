@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "name": "Palindromes over {a,b}",
+  "inputAlphabet": [
+    "a",
+    "b"
+  ],
+  "tapeAlphabet": [
+    "a",
+    "b",
+    "_"
+  ],
+  "blank": "_",
+  "states": [
+    {
+      "id": "q0",
+      "label": "q0"
+    },
+    {
+      "id": "qa1",
+      "label": "qa1"
+    },
+    {
+      "id": "qa2",
+      "label": "qa2"
+    },
+    {
+      "id": "qb1",
+      "label": "qb1"
+    },
+    {
+      "id": "qb2",
+      "label": "qb2"
+    },
+    {
+      "id": "back",
+      "label": "back"
+    },
+    {
+      "id": "accept",
+      "label": "accept"
+    }
+  ],
+  "start": "q0",
+  "accepting": [
+    "accept"
+  ],
+  "rejecting": [],
+  "transitions": [
+    {
+      "from": "q0",
+      "to": "qa1",
+      "read": "a",
+      "write": "_",
+      "move": "R"
+    },
+    {
+      "from": "q0",
+      "to": "qb1",
+      "read": "b",
+      "write": "_",
+      "move": "R"
+    },
+    {
+      "from": "q0",
+      "to": "accept",
+      "read": "_",
+      "write": "_",
+      "move": "S"
+    },
+    {
+      "from": "qa1",
+      "to": "qa1",
+      "read": "a",
+      "write": "a",
+      "move": "R"
+    },
+    {
+      "from": "qa1",
+      "to": "qa1",
+      "read": "b",
+      "write": "b",
+      "move": "R"
+    },
+    {
+      "from": "qa1",
+      "to": "qa2",
+      "read": "_",
+      "write": "_",
+      "move": "L"
+    },
+    {
+      "from": "qa2",
+      "to": "back",
+      "read": "a",
+      "write": "_",
+      "move": "L"
+    },
+    {
+      "from": "qa2",
+      "to": "accept",
+      "read": "_",
+      "write": "_",
+      "move": "S"
+    },
+    {
+      "from": "qb1",
+      "to": "qb1",
+      "read": "a",
+      "write": "a",
+      "move": "R"
+    },
+    {
+      "from": "qb1",
+      "to": "qb1",
+      "read": "b",
+      "write": "b",
+      "move": "R"
+    },
+    {
+      "from": "qb1",
+      "to": "qb2",
+      "read": "_",
+      "write": "_",
+      "move": "L"
+    },
+    {
+      "from": "qb2",
+      "to": "back",
+      "read": "b",
+      "write": "_",
+      "move": "L"
+    },
+    {
+      "from": "qb2",
+      "to": "accept",
+      "read": "_",
+      "write": "_",
+      "move": "S"
+    },
+    {
+      "from": "back",
+      "to": "back",
+      "read": "a",
+      "write": "a",
+      "move": "L"
+    },
+    {
+      "from": "back",
+      "to": "back",
+      "read": "b",
+      "write": "b",
+      "move": "L"
+    },
+    {
+      "from": "back",
+      "to": "q0",
+      "read": "_",
+      "write": "_",
+      "move": "R"
+    }
+  ]
+}

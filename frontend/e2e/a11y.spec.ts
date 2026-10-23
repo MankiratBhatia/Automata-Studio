@@ -122,6 +122,52 @@ for (const theme of ['light', 'dark'] as const) {
       await expectAccessible(page, 'shortcuts dialog')
     })
 
+    test('pushdown automaton screen: editor, run result, stack', async ({ page }) => {
+      await page
+        .getByRole('navigation', { name: 'Kind of machine' })
+        .getByRole('button', { name: 'Pushdown automata' })
+        .click()
+      await expectAccessible(page, 'PDA editor')
+      await page.getByRole('tab', { name: 'Run', exact: true }).click()
+      await page.getByLabel('Input string').fill('aabb')
+      await page.getByRole('button', { name: 'Run', exact: true }).click()
+      await expect(page.getByTestId('verdict')).toBeVisible()
+      await page.getByRole('button', { name: 'Next step' }).click()
+      await expectAccessible(page, 'PDA run with stack')
+      await page.getByLabel('Input string').fill('aab')
+      await page.getByRole('button', { name: 'Run', exact: true }).click()
+      await expect(page.getByTestId('verdict')).toHaveText('Rejected')
+      await expectAccessible(page, 'PDA rejected, closest attempt')
+      await page.getByLabel('Input string').fill('abx')
+      await page.getByRole('button', { name: 'Run', exact: true }).click()
+      await expect(page.getByRole('alert')).toBeVisible()
+      await expectAccessible(page, 'PDA input error')
+    })
+
+    test('Turing machine screen: editor, tape, step limit', async ({ page }) => {
+      await page
+        .getByRole('navigation', { name: 'Kind of machine' })
+        .getByRole('button', { name: 'Turing machines' })
+        .click()
+      await expectAccessible(page, 'TM editor')
+      await page.getByRole('tab', { name: 'Run', exact: true }).click()
+      await page.getByLabel('Input string').fill('1011')
+      await page.getByRole('button', { name: 'Run', exact: true }).click()
+      await expect(page.getByTestId('tape')).toBeVisible()
+      await page.getByRole('button', { name: 'Next step' }).click()
+      await expectAccessible(page, 'TM run with tape')
+      await page
+        .getByRole('combobox', { name: 'Load example' })
+        .selectOption({ label: 'Runs forever (step limit demo)' })
+      await page.getByLabel('Input string').fill('a')
+      await page.getByRole('button', { name: 'Run', exact: true }).click()
+      await expect(page.getByTestId('verdict')).toHaveText('Step limit')
+      await expectAccessible(page, 'TM step limit')
+      await page.getByRole('tab', { name: 'Machine', exact: true }).click()
+      await page.getByRole('button', { name: 'Add transition' }).click()
+      await expectAccessible(page, 'TM editor with a problem listed')
+    })
+
     test('export menu, tip bar and toast', async ({ page }) => {
       await example(page, 'Ends with 01')
       await page.getByRole('button', { name: /^Export/ }).click()

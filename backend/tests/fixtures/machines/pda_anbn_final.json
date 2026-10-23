@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "name": "a^n b^n (accept by final state)",
+  "inputAlphabet": [
+    "a",
+    "b"
+  ],
+  "stackAlphabet": [
+    "Z",
+    "A"
+  ],
+  "startStack": "Z",
+  "acceptBy": "finalState",
+  "states": [
+    {
+      "id": "q0",
+      "label": "q0"
+    },
+    {
+      "id": "q1",
+      "label": "q1"
+    },
+    {
+      "id": "q2",
+      "label": "q2"
+    }
+  ],
+  "start": "q0",
+  "accepting": [
+    "q2"
+  ],
+  "transitions": [
+    {
+      "from": "q0",
+      "to": "q0",
+      "input": "a",
+      "pop": "Z",
+      "push": "AZ"
+    },
+    {
+      "from": "q0",
+      "to": "q0",
+      "input": "a",
+      "pop": "A",
+      "push": "AA"
+    },
+    {
+      "from": "q0",
+      "to": "q2",
+      "input": null,
+      "pop": "Z",
+      "push": "Z"
+    },
+    {
+      "from": "q0",
+      "to": "q1",
+      "input": "b",
+      "pop": "A",
+      "push": ""
+    },
+    {
+      "from": "q1",
+      "to": "q1",
+      "input": "b",
+      "pop": "A",
+      "push": ""
+    },
+    {
+      "from": "q1",
+      "to": "q2",
+      "input": null,
+      "pop": "Z",
+      "push": "Z"
+    }
+  ]
+}

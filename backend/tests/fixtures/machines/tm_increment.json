@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "name": "Binary increment",
+  "inputAlphabet": [
+    "0",
+    "1"
+  ],
+  "tapeAlphabet": [
+    "0",
+    "1",
+    "_"
+  ],
+  "blank": "_",
+  "states": [
+    {
+      "id": "scan",
+      "label": "scan"
+    },
+    {
+      "id": "carry",
+      "label": "carry"
+    },
+    {
+      "id": "done",
+      "label": "done"
+    }
+  ],
+  "start": "scan",
+  "accepting": [
+    "done"
+  ],
+  "rejecting": [],
+  "transitions": [
+    {
+      "from": "scan",
+      "to": "scan",
+      "read": "0",
+      "write": "0",
+      "move": "R"
+    },
+    {
+      "from": "scan",
+      "to": "scan",
+      "read": "1",
+      "write": "1",
+      "move": "R"
+    },
+    {
+      "from": "scan",
+      "to": "carry",
+      "read": "_",
+      "write": "_",
+      "move": "L"
+    },
+    {
+      "from": "carry",
+      "to": "carry",
+      "read": "1",
+      "write": "0",
+      "move": "L"
+    },
+    {
+      "from": "carry",
+      "to": "done",
+      "read": "0",
+      "write": "1",
+      "move": "S"
+    },
+    {
+      "from": "carry",
+      "to": "done",
+      "read": "_",
+      "write": "1",
+      "move": "S"
+    }
+  ]
+}

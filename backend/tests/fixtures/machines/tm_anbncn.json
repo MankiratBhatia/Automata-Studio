@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "name": "a^n b^n c^n",
+  "inputAlphabet": [
+    "a",
+    "b",
+    "c"
+  ],
+  "tapeAlphabet": [
+    "a",
+    "b",
+    "c",
+    "X",
+    "Y",
+    "Z",
+    "_"
+  ],
+  "blank": "_",
+  "states": [
+    {
+      "id": "q0",
+      "label": "q0"
+    },
+    {
+      "id": "q1",
+      "label": "q1"
+    },
+    {
+      "id": "q2",
+      "label": "q2"
+    },
+    {
+      "id": "q3",
+      "label": "q3"
+    },
+    {
+      "id": "q4",
+      "label": "q4"
+    },
+    {
+      "id": "accept",
+      "label": "accept"
+    }
+  ],
+  "start": "q0",
+  "accepting": [
+    "accept"
+  ],
+  "rejecting": [],
+  "transitions": [
+    {
+      "from": "q0",
+      "to": "q1",
+      "read": "a",
+      "write": "X",
+      "move": "R"
+    },
+    {
+      "from": "q0",
+      "to": "q4",
+      "read": "Y",
+      "write": "Y",
+      "move": "R"
+    },
+    {
+      "from": "q0",
+      "to": "accept",
+      "read": "_",
+      "write": "_",
+      "move": "S"
+    },
+    {
+      "from": "q1",
+      "to": "q1",
+      "read": "a",
+      "write": "a",
+      "move": "R"
+    },
+    {
+      "from": "q1",
+      "to": "q1",
+      "read": "Y",
+      "write": "Y",
+      "move": "R"
+    },
+    {
+      "from": "q1",
+      "to": "q2",
+      "read": "b",
+      "write": "Y",
+      "move": "R"
+    },
+    {
+      "from": "q2",
+      "to": "q2",
+      "read": "b",
+      "write": "b",
+      "move": "R"
+    },
+    {
+      "from": "q2",
+      "to": "q2",
+      "read": "Z",
+      "write": "Z",
+      "move": "R"
+    },
+    {
+      "from": "q2",
+      "to": "q3",
+      "read": "c",
+      "write": "Z",
+      "move": "L"
+    },
+    {
+      "from": "q3",
+      "to": "q3",
+      "read": "a",
+      "write": "a",
+      "move": "L"
+    },
+    {
+      "from": "q3",
+      "to": "q3",
+      "read": "b",
+      "write": "b",
+      "move": "L"
+    },
+    {
+      "from": "q3",
+      "to": "q3",
+      "read": "Y",
+      "write": "Y",
+      "move": "L"
+    },
+    {
+      "from": "q3",
+      "to": "q3",
+      "read": "Z",
+      "write": "Z",
+      "move": "L"
+    },
+    {
+      "from": "q3",
+      "to": "q0",
+      "read": "X",
+      "write": "X",
+      "move": "R"
+    },
+    {
+      "from": "q4",
+      "to": "q4",
+      "read": "Y",
+      "write": "Y",
+      "move": "R"
+    },
+    {
+      "from": "q4",
+      "to": "q4",
+      "read": "Z",
+      "write": "Z",
+      "move": "R"
+    },
+    {
+      "from": "q4",
+      "to": "accept",
+      "read": "_",
+      "write": "_",
+      "move": "S"
+    }
+  ]
+}

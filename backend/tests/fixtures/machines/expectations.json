@@ -1,0 +1,9 @@
+{
+  "pda_anbn_final": {"accept": ["", "ab", "aabb", "aaabbb"], "reject": ["a", "b", "ba", "aab", "abb", "abab", "aabbb"]},
+  "pda_anbn_empty": {"accept": ["", "ab", "aabb", "aaabbb"], "reject": ["a", "b", "ba", "aab", "abb", "abab", "aabbb"]},
+  "pda_palindromes": {"accept": ["", "aa", "bb", "abba", "baab", "aabbaa"], "reject": ["a", "ab", "aba", "abab", "aabb"]},
+  "pda_balanced": {"accept": ["", "()", "(())", "()()", "(()())"], "reject": ["(", ")", ")(", "(()", "())", "()(("]},
+  "tm_anbncn": {"accept": ["", "abc", "aabbcc", "aaabbbccc"], "reject": ["a", "ab", "abcc", "aabbc", "abcabc", "acb", "cba"]},
+  "tm_palindromes": {"accept": ["", "a", "b", "aa", "aba", "abba", "babab"], "reject": ["ab", "aab", "abb", "abab", "aabb"]},
+  "tm_increment": {"outputs": {"": "1", "0": "1", "1": "10", "10": "11", "11": "100", "101": "110", "1011": "1100", "111": "1000"}}
+}

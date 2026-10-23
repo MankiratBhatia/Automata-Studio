@@ -1,4 +1,4 @@
-# Demo script (about 5 minutes)
+# Demo script (about 5 minutes, plus a 1-minute bonus)
 
 A walkthrough that shows every major feature in order. It is also run automatically as an end-to-end test (`frontend/e2e/demo.spec.ts`), so if a step stops working the test fails.
 
@@ -64,6 +64,15 @@ Projects are saved in `backend/data/automata.sqlite3`. Delete that file for a bl
 1. Press **Ctrl+S** (or **Save**): the project is saved on the backend. Reload the page and open **Projects** to see it.
 2. **Export ▾** → **Image (.png)** for a figure, or **Transition table (.md)** for a report.
 3. Switch **Theme** to Dark. Press **?** to show the keyboard shortcuts.
+
+## Bonus: beyond finite automata (+1 minute)
+
+*Idea: more memory means more power.*
+
+1. Press **Pushdown automata** in the header switch. The example accepts aⁿbⁿ, which no finite automaton can. Open **Run**, type `aaabbb` and press **Run**; step forward and watch the **stack** grow with each `a` and shrink with each `b`, and the active move light up on the diagram.
+2. Try `aab`: **Rejected**, and the panel shows the closest attempt.
+3. Press **Turing machines**. The example adds one to a binary number. Run `1011` and step through: the head sweeps right, then carries left; the tape under the diagram shows each write. The final tape is `1100`.
+4. **Examples → Runs forever** and run it: the verdict is **Step limit**. Explain that no program can decide in general whether a machine halts.
 
 ## If something goes wrong
 

@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app import adapters, schemas, storage
-from app.routers import analyze, convert, projects
+from app.routers import analyze, convert, machines, projects
 from automata_core.errors import (
     InputSymbolError,
     InvalidAutomatonError,
@@ -26,6 +26,7 @@ app.add_middleware(
 
 app.include_router(analyze.router)
 app.include_router(convert.router)
+app.include_router(machines.router)
 app.include_router(projects.router)
 
 
@@ -40,7 +41,7 @@ def _invalid_automaton(_: Request, exc: InvalidAutomatonError) -> JSONResponse:
         400,
         schemas.ErrorBody(
             code="INVALID_AUTOMATON",
-            message="The automaton has errors. Fix them before running this operation.",
+            message="This has errors. Fix them before running this operation.",
             issues=[adapters.issue_out(i) for i in exc.issues],
         ),
     )
