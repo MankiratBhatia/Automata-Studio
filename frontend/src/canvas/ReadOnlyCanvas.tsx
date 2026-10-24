@@ -15,6 +15,11 @@ interface Props {
   /** What to emphasise: active states and transitions, partition colours, what is built yet. */
   view?: Partial<CanvasView>
   label: string
+  /**
+   * Pan, zoom and the zoom buttons. Turn off for a picture that sits inside a scrolling page,
+   * so the mouse wheel scrolls the page instead of being captured by the diagram.
+   */
+  interactive?: boolean
 }
 
 /**
@@ -29,7 +34,7 @@ export function ReadOnlyCanvas(props: Props) {
   )
 }
 
-function Inner({ doc, view, label }: Props) {
+function Inner({ doc, view, label, interactive = true }: Props) {
   const dark = useTheme((s) => s.dark)
   const { nodes, edges } = useMemo(
     () => toFlow(doc, { ...NO_VIEW, ...view, readOnly: true }),
@@ -43,6 +48,11 @@ function Inner({ doc, view, label }: Props) {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         colorMode={dark ? 'dark' : 'light'}
+        panOnDrag={interactive}
+        zoomOnScroll={interactive}
+        zoomOnPinch={interactive}
+        zoomOnDoubleClick={interactive}
+        preventScrolling={interactive}
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={false}
@@ -53,7 +63,7 @@ function Inner({ doc, view, label }: Props) {
         fitViewOptions={{ padding: 0.3, maxZoom: 1.25 }}
       >
         <Background gap={20} />
-        <Controls showInteractive={false} />
+        {interactive && <Controls showInteractive={false} />}
       </ReactFlow>
     </div>
   )

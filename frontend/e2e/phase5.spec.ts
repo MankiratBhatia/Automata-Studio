@@ -33,7 +33,7 @@ test.beforeEach(async ({ page, request }) => {
   for (const p of all as { id: string; name: string }[]) {
     if (p.name.startsWith('E2E ')) await request.delete(`/api/projects/${p.id}`)
   }
-  await page.goto('/')
+  await page.goto('/#/studio')
   await page.evaluate(() => localStorage.clear())
   await page.reload()
 })

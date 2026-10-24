@@ -14,7 +14,7 @@ const built = (page: Page) =>
   page.getByTestId('replay').locator('[data-testid^="state-"]:not(.opacity-0)')
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#/studio')
   await page.evaluate(() => localStorage.clear())
   await page.reload()
 })

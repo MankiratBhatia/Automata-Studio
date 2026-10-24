@@ -27,7 +27,7 @@ async function exportAs(page: Page, item: string) {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#/studio')
   await page.evaluate(() => localStorage.clear())
   await page.reload()
 })

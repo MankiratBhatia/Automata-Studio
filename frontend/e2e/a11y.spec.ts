@@ -21,7 +21,7 @@ const side = (page: Page, name: string) => page.getByRole('tab', { name, exact: 
 for (const theme of ['light', 'dark'] as const) {
   test.describe(`${theme} theme`, () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto('/')
+      await page.goto('/#/studio')
       await page.evaluate(() => localStorage.clear())
       await page.reload()
       await page.getByLabel('Theme').selectOption(theme)

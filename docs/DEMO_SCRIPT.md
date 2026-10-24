@@ -11,11 +11,15 @@ cd backend && .venv/bin/uvicorn app.main:app
 cd frontend && npm run dev
 ```
 
-Open <http://localhost:5173> in a window of about 1280×720 (a projector resolution). The header should say **Backend connected**. For a clean start, clear the site data for `localhost:5173` so the first-run hints appear.
+Open <http://localhost:5173> (the home page) in a window of about 1280×720 (a projector resolution). The header should say **Backend connected**. For a clean start, clear the site data for `localhost:5173` so the first-run hints appear.
 
 Projects are saved in `backend/data/automata.sqlite3`. Delete that file for a blank list.
 
-## 1. Draw and simulate (0:00 – 1:15)
+## 0. The home page (0:00 – 0:15)
+
+Open <http://localhost:5173>. The home page says what the project is, shows a live preview of the studio (the real automaton reading `1101`), and previews the three kinds of machine. Press **Launch Studio**.
+
+## 1. Draw and simulate (0:15 – 1:15)
 
 *Idea: a DFA is a machine that reads a string one symbol at a time.*
 

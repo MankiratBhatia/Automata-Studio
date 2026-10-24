@@ -4,6 +4,7 @@ import { EXAMPLES } from './examples'
 import { ExportMenu } from './ExportMenu'
 import { MachineToolbar } from './machines/MachineToolbar'
 import { useMode } from './mode'
+import { hrefFor } from './route'
 import { ModeSwitch } from './ModeSwitch'
 import { ParseError, parseAutomaton } from './model/serialize'
 import { useStudioStore } from './store/useStudioStore'
@@ -39,7 +40,15 @@ export function Header() {
   return (
     <header className="border-b border-slate-200 dark:border-slate-700">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2">
-        <h1 className="text-lg font-semibold">Automata Studio</h1>
+        <h1 className="text-lg font-semibold">
+          <a
+            href={hrefFor('home')}
+            title="Back to the home page"
+            className="rounded hover:text-blue-700 dark:hover:text-blue-300"
+          >
+            Automata Studio
+          </a>
+        </h1>
         <ModeSwitch />
 
         {mode !== 'fa' && <MachineToolbar kind={mode} />}

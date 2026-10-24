@@ -28,6 +28,14 @@ test('the whole demo script runs cleanly, in well under five minutes', async ({ 
   test.setTimeout(120_000)
   const started = Date.now()
 
+  // 0. The home page, then into the studio
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Build. Simulate. Understand.')
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: /Launch Studio/ })
+    .first()
+    .click()
+
   // 1. Draw and simulate
   await expect(page.getByRole('heading', { name: 'Start an automaton' })).toBeVisible()
   await page.getByRole('button', { name: 'Try an example' }).click()

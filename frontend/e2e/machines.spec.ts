@@ -25,7 +25,7 @@ const stackNow = (page: Page) =>
   page.getByTestId('stack').locator('li span:first-child').allTextContents()
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#/studio')
   await page.evaluate(() => localStorage.clear())
   await page.reload()
 })

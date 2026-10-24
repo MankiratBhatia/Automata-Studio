@@ -1,7 +1,7 @@
 import { expect, test, type Page } from './fixtures.ts'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#/studio')
   await page.evaluate(() => localStorage.clear())
   await page.reload()
   await page.getByRole('tab', { name: 'Convert' }).click()

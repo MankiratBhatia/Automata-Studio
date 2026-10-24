@@ -39,6 +39,13 @@ cd frontend && npm run lint && npm run format:check && npm run typecheck && npm 
 cd frontend && npx playwright install chromium && npm run e2e   # starts both servers itself
 ```
 
+## Home page and routes
+
+The app opens on a **home page** (`/`) that explains the project and has a **Launch Studio** button.
+The studio itself is at `/#/studio`, so you can bookmark it or link straight to it. Routing uses the URL
+hash, which needs no server configuration, and the browser's back button works. Clicking the
+*Automata Studio* title in the studio returns to the home page.
+
 ## Using the editor
 
 - **Add a state:** double-click empty canvas (or *Add* from a state's panel).
